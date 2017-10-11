@@ -36,8 +36,8 @@ namespace Diladele.ActiveDirectory.Inspection
                 foreach (ManagementObject mo in searcher.Get())
                 {
                     string dnsHostName = mo["DNSHostName"].ToString();
-                    string domain = mo["Domain"].ToString();
-                    bool partOfDomain = (bool)mo["PartOfDomain"];
+                    string domain      = mo["Domain"].ToString();
+                    bool partOfDomain  = (bool)mo["PartOfDomain"];
 
                     result = dnsHostName;
                     if (partOfDomain)

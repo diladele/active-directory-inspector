@@ -24,7 +24,7 @@ namespace Diladele.ActiveDirectory.Inspection
         {
             List<InfoBase> result = null;
 
-            lock (_lock)
+            lock (_guard)
             {
                 result = _queue;
                 _queue = new List<InfoBase>();
@@ -35,11 +35,11 @@ namespace Diladele.ActiveDirectory.Inspection
 
         private EventLog       _log;
         private List<InfoBase> _queue = new List<InfoBase>();
-        private System.Object  _lock  = new System.Object();
+        private System.Object  _guard = new System.Object();
 
         private void OnEntryWritten(object sender, EntryWrittenEventArgs e)
         {
-            lock (_lock)
+            lock (_guard)
             {
                 // no exception should leave the handler
                 try
@@ -87,6 +87,6 @@ namespace Diladele.ActiveDirectory.Inspection
             {
                 _queue.Add(info);
             }
-        }  
+        }
     }
 }
