@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diladele.ActiveDirectory.In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diladele.ActiveDirectory.Service", "Diladele.ActiveDirectory.Service\Diladele.ActiveDirectory.Service.csproj", "{3CB3F0DF-706C-4883-ADBF-FC06A342699F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diladele.ActiveDirectory.Inspection.Test", "Diladele.ActiveDirectory.Inspection.Test\Diladele.ActiveDirectory.Inspection.Test.csproj", "{FD205382-778D-4659-9A04-35072222F3F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3CB3F0DF-706C-4883-ADBF-FC06A342699F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CB3F0DF-706C-4883-ADBF-FC06A342699F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CB3F0DF-706C-4883-ADBF-FC06A342699F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD205382-778D-4659-9A04-35072222F3F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD205382-778D-4659-9A04-35072222F3F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD205382-778D-4659-9A04-35072222F3F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD205382-778D-4659-9A04-35072222F3F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

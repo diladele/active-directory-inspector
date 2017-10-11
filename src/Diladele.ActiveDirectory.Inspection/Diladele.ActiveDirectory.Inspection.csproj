@@ -41,6 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventLogEntryParser.cs" />
+    <Compile Include="EventLogListener.cs" />
+    <Compile Include="LogonInfo.cs" />
     <Compile Include="ProbedInfo.cs" />
     <Compile Include="Prober.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
