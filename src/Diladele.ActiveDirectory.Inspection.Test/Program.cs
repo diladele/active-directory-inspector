@@ -10,8 +10,32 @@ namespace Diladele.ActiveDirectory.Inspection.Test
     {
         static void Main(string[] args)
         {
-            TestEventLogListener();
-            TestProber();
+            //TestHarvester();
+            TestInspector();
+            //TestEventLogListener();
+            //TestProber();
+        }
+
+
+        static void TestHarvester()
+        {
+            var harvester = new Harvester();
+            foreach(WorkstationInfo w in harvester.GetWorkstations())
+            {
+                Console.WriteLine(w.DnsHostName);
+            }
+        }
+
+        static void TestInspector()
+        {
+            using(var inspector = new Inspector())
+            {
+                for (var i = 0; i < 1000; i++)
+                {
+                    // wait 
+                    Thread.Sleep(10000);
+                }
+            }
         }
 
         static void TestEventLogListener()
