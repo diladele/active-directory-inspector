@@ -22,8 +22,8 @@ namespace Diladele.ActiveDirectory.Inspection
 
         public static void Update(this Storage storage, Activity activity)
         {
-            // invalid network address is not interesting
-            if (activity.Network_Address == "-")
+            // local or invalid network address are not interesting
+            if (activity.Network_Address == "-" || activity.Network_Address == "::1")
                 return;
 
             Debug.Assert(false);
