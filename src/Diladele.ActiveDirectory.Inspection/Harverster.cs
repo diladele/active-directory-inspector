@@ -8,23 +8,17 @@ using System.Threading;
 
 namespace Diladele.ActiveDirectory.Inspection
 {
-    public class WorkstationInfo
-    {
-        public string CN;
-        public string DN;
-        public string DnsHostName;
-        public Int64  LastLogon;
-        public string Name;
-    }
     //
     // 
     //
     public class Harvester
     {
-        public List<WorkstationInfo> GetWorkstations()
+        public static List<Workstation> Harvest()
         {
-            List<WorkstationInfo> result = new List<WorkstationInfo>();
+            // this is the value to return
+            List<Workstation> result = new List<Workstation>();
 
+            // connect to LDAP
             using (DirectoryEntry root = new DirectoryEntry())
             {
                 using (DirectorySearcher searcher = new DirectorySearcher(root))
@@ -37,24 +31,24 @@ namespace Diladele.ActiveDirectory.Inspection
                     var entries = searcher.FindAll();
                     foreach (SearchResult entry in entries)
                     {
-                        WorkstationInfo info = new WorkstationInfo();
+                        Workstation w = new Workstation();
                         {
                             if (entry.Properties["cn"].Count > 0)
-                                info.CN = (string)entry.Properties["cn"][0];
+                                w.CommonName = (string)entry.Properties["cn"][0];
 
                             if (entry.Properties["distinguishedName"].Count > 0)
-                                info.DN = (string)entry.Properties["distinguishedName"][0];
+                                w.DistinguishedName = (string)entry.Properties["distinguishedName"][0];
 
                             if (entry.Properties["dNSHostName"].Count > 0)
-                                info.DnsHostName = (string)entry.Properties["dNSHostName"][0];
+                                w.DnsHostName = (string)entry.Properties["dNSHostName"][0];
 
                             if (entry.Properties["lastLogon"].Count > 0)
-                                info.LastLogon = (Int64)entry.Properties["lastLogon"][0];
+                                w.LastLogon = (Int64)entry.Properties["lastLogon"][0];
 
                             if (entry.Properties["name"].Count > 0)
-                                info.Name = (string)entry.Properties["name"][0];
+                                w.Name = (string)entry.Properties["name"][0];
                         }
-                        result.Add(info);
+                        result.Add(w);
                     }
                 }
             }

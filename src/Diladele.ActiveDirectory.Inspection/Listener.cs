@@ -9,9 +9,9 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     //
     //
-    public class EventLogListener
+    public class Listener
     {
-        public EventLogListener()
+        public Listener()
         {
             _log = new EventLog("Security");
             {
@@ -20,22 +20,22 @@ namespace Diladele.ActiveDirectory.Inspection
             }
         }
 
-        public List<InfoBase> GetEvents()
+        public List<Activity> GetActivities()
         {
-            List<InfoBase> result = null;
+            List<Activity> result = null;
 
             lock (_guard)
             {
                 result = _queue;
-                _queue = new List<InfoBase>();
+                _queue = new List<Activity>();
             }
 
             return result;
         }
 
-        private EventLog       _log;
-        private List<InfoBase> _queue = new List<InfoBase>();
-        private System.Object  _guard = new System.Object();
+        private List<Activity> _queue = new List<Activity>();
+        private System.Object      _guard = new System.Object();
+        private EventLog           _log;
 
         private void OnEntryWritten(object sender, EntryWrittenEventArgs e)
         {
@@ -83,9 +83,9 @@ namespace Diladele.ActiveDirectory.Inspection
 
         private void HandleLogonEvent(EventLogEntry entry)
         {
-            LogonInfo info = (new EventLogEntryParser()).ParseLogonEvent(entry);
+            LoggedOn activity = (new ActivityParser()).ParseLogonEvent(entry);
             {
-                _queue.Add(info);
+                _queue.Add(activity);
             }
         }
     }

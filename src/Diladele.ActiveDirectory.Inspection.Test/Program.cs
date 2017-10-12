@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 
@@ -19,8 +20,7 @@ namespace Diladele.ActiveDirectory.Inspection.Test
 
         static void TestHarvester()
         {
-            var harvester = new Harvester();
-            foreach(WorkstationInfo w in harvester.GetWorkstations())
+            foreach(Workstation w in Harvester.Harvest())
             {
                 Console.WriteLine(w.DnsHostName);
             }
@@ -40,14 +40,14 @@ namespace Diladele.ActiveDirectory.Inspection.Test
 
         static void TestEventLogListener()
         {
-            var listener = new EventLogListener();
+            var listener = new Listener();
             while (true)
             {
                 // wait 
                 Thread.Sleep(5000);
 
                 // get the events accumulated
-                foreach(InfoBase info in listener.GetEvents())
+                foreach(Activity info in listener.GetActivities())
                 {
                     Console.WriteLine(info);
                 }
@@ -56,18 +56,16 @@ namespace Diladele.ActiveDirectory.Inspection.Test
 
         static void TestProber()
         {
-            Prober prober = new Prober("192.168.1.103");
+            var ip = IPAddress.Parse("192.168.1.103");
+
+            List<User> users = UserProber.Probe(ip);
+            foreach (var user in users)
             {
-                List<ProbedInfo> probes = prober.Probe();
-                foreach (ProbedInfo info in probes)
-                {
-                    Console.WriteLine(info.Domain);
-                    Console.WriteLine(info.UserName);
-                    Console.WriteLine(info.UserSid);
-                }
+                Console.WriteLine(user.Domain);
+                Console.WriteLine(user.Name);
+                Console.WriteLine(user.Sid);
             }
+            
         }
-
-
     }
 }

@@ -5,15 +5,15 @@ using System.Text;
 
 namespace Diladele.ActiveDirectory.Inspection
 {
-    public class InfoBase
+    public class Activity
     {
         public string    Logon_ID;
         public string    Logon_GUID;
-        public string    Network_Address;       // on what IP address logon occured
+        public string    Network_Address;       // on what IP address this event occured
 
     }
-    
-    class LogonInfo : InfoBase
+
+    class LoggedOn : Activity
     {
         public enum LogonType
         {
@@ -38,7 +38,7 @@ namespace Diladele.ActiveDirectory.Inspection
         public LogonType Logon_Type;        
     }
 
-    class LogoffInfo : InfoBase
+    class LoggedOff : Activity
     {
     }
 }

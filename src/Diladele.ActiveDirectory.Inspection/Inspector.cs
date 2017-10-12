@@ -20,11 +20,8 @@ namespace Diladele.ActiveDirectory.Inspection
                 // load existing storage from disk
                 _storage = Storage.LoadFromDisk();
 
-                // construct the listener
-                _listener = new EventLogListener();
-
-                // construct the harvester
-                _harverster = new Harvester();
+                // construct the event log listener
+                _listener = new Listener();
             }
 
             // and start the timer
@@ -53,8 +50,7 @@ namespace Diladele.ActiveDirectory.Inspection
             lock (_guard)
             {
                 // and clean up
-                _listener   = null;
-                _harverster = null;
+                _listener   = null;                
             }
         }
 
@@ -63,9 +59,8 @@ namespace Diladele.ActiveDirectory.Inspection
         private bool _stopping = false;
         private bool _active = false;
         
-        private Timer            _timer;
-        private Harvester        _harverster;
-        private EventLogListener _listener;
+        private Timer    _timer;        
+        private Listener _listener;
         
         
         private void OnTimerElapsedSafe(Object state)
@@ -102,26 +97,26 @@ namespace Diladele.ActiveDirectory.Inspection
         }
 
         //
-        // may and will through exceptions at will (wrapped by safe function)
+        // may and will through exceptions when needed (wrapped by safe function)
         //
         private void OnTimerElapsed(Object state)
         {
-            // these are copies of event log records and and storage data
-            List<InfoBase>      records;
-            List<IpAddressInfo> data;
+            // these are copies of user activity and storage
+            List<Activity> activities;
+            Storage        storage;
             {
                 lock (_guard)
                 {
-                    records = _listener.GetEvents();
-                    data    = _storage.Clone();
+                    activities = _listener.GetActivities();
+                    storage    = Storage.Clone(_storage);
                 }
             }
 
             // we have some event log records, adjust the storage based on each (quick)
-            (new DataUpdater()).Update(data, records);
+            storage.Update(activities);
 
             // harvest workstations (quick)
-            var workstations = (new Harvester()).GetWorkstations();
+            var workstations = Harvester.Harvest();
 
             // now probe each workstation (slow)
             foreach(var workstation in workstations)
@@ -134,14 +129,17 @@ namespace Diladele.ActiveDirectory.Inspection
                 }
 
                 // probe and possible add to data
-                (new DataProber()).Probe(data, workstation);
+                storage.Probe(workstation);
             }
 
             // finally if we got here then everything in data is fresh and probed, replace it
             lock (_guard)
             {
                 // swap the data in the class
-                _storage.Swap(data);
+                _storage = storage;
+
+                // and save it on disk
+                Storage.SaveToDisk(_storage);
             }
 
             // fine, let's wait for the next timer fire

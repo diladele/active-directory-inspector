@@ -6,11 +6,14 @@ using System.Text;
 
 namespace Diladele.ActiveDirectory.Inspection
 {
-    class EventLogEntryParser
+    //
+    //
+    //
+    class ActivityParser
     {
-        public LogonInfo ParseLogonEvent(EventLogEntry entry)
+        public LoggedOn ParseLogonEvent(EventLogEntry entry)
         {
-            var result = new LogonInfo();
+            var result = new LoggedOn();
             {
                 result.Security_ID     = this.GetReplacementString(entry, New_Logon_Security_ID);
                 result.Account_Name    = this.GetReplacementString(entry, New_Logon_Account_Name);
@@ -54,9 +57,9 @@ namespace Diladele.ActiveDirectory.Inspection
             return result;
         }
 
-        private LogonInfo.LogonType ParseLogonType(EventLogEntry entry)
+        private LoggedOn.LogonType ParseLogonType(EventLogEntry entry)
         {
-            LogonInfo.LogonType result = LogonInfo.LogonType.Unknown;
+            LoggedOn.LogonType result = LoggedOn.LogonType.Unknown;
 
             string value_str = GetReplacementString(entry, New_Logon_Type);
             if(value_str.Length > 0)
@@ -66,7 +69,7 @@ namespace Diladele.ActiveDirectory.Inspection
                 {
                     try
                     {
-                        result = (LogonInfo.LogonType)value;
+                        result = (LoggedOn.LogonType)value;
                     }
                     catch(Exception e)
                     {
@@ -79,9 +82,9 @@ namespace Diladele.ActiveDirectory.Inspection
             return result;
         }
 
-        public LogoffInfo ParseLogoffEvent(EventLogEntry entry, bool userInitiated)
+        public LoggedOff ParseLogoffEvent(EventLogEntry entry, bool userInitiated)
         {
-            return new LogoffInfo();
+            return new LoggedOff();
         }
 
 
