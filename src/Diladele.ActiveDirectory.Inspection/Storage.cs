@@ -8,39 +8,23 @@ using System.Xml.Serialization;
 
 namespace Diladele.ActiveDirectory.Inspection
 {
-    //
-    //
-    //
-
     [Serializable]
     [XmlRoot("Storage")]
     public class Storage
     {
         public Storage()
         {
-            _data = new List<IpAddressInfo>();
+            _workstations = new List<Workstation>();
         }
 
-        public List<IpAddressInfo> Clone()
-        {
-            List<IpAddressInfo> result = new List<IpAddressInfo>();
-            {
-                foreach(IpAddressInfo entry in _data)
-                {
-                    result.Add(entry.Clone());
-                }
-            }
-            return result;
-        }
-
-        public List<IpAddressInfo> Swap(List<IpAddressInfo> value)
+        public List<Workstation> Swap(List<Workstation> value)
         {
             Debug.Assert(value != null);
 
-            List<IpAddressInfo> result;
+            List<Workstation> result;
             {
-                result = _data;
-                _data  = value;
+                result        = _workstations;
+                _workstations = value;
 
                 // swap ALWAYS saves data to disk
                 Storage.SaveToDisk(this);
@@ -48,10 +32,10 @@ namespace Diladele.ActiveDirectory.Inspection
             return result;
         }
 
-        private List<IpAddressInfo> _data;
-        public List<IpAddressInfo> Data
+        private List<Workstation> _workstations;
+        public List<Workstation> Workstations
         {
-            get { return _data; }
+            get { return _workstations; }
         }
 
         private static string GetDiskPath()
@@ -60,7 +44,7 @@ namespace Diladele.ActiveDirectory.Inspection
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "Diladele",
                 "Active Directory Inspector",
-                "data.xml"
+                "storage.xml"
            );
         }
 
@@ -117,6 +101,22 @@ namespace Diladele.ActiveDirectory.Inspection
             if (File.Exists(cur_path))
                 File.Delete(cur_path);
             File.Move(new_path, cur_path);
+        }
+
+        public static Storage Clone(Storage v)
+        {
+            Storage result = new Storage();
+            {
+                // clone all simple members (we have none)
+
+                // and manually clone the  list
+                result._workstations = new List<Workstation>();
+                foreach(var workstation in v._workstations)
+                {
+                    result._workstations.Add((Workstation)workstation.Clone());
+                }
+            }
+            return result;
         }
     }
 }
