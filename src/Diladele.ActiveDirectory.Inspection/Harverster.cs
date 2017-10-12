@@ -15,6 +15,9 @@ namespace Diladele.ActiveDirectory.Inspection
     {
         public static List<Workstation> Harvest()
         {
+            // trace it
+            Trace.TraceInformation("Harvester - harvesting LDAP directory....");
+
             // this is the value to return
             List<Workstation> result = new List<Workstation>();
 
@@ -52,6 +55,11 @@ namespace Diladele.ActiveDirectory.Inspection
                     }
                 }
             }
+
+            // trace it
+            Trace.TraceInformation("Harvester - harvest finished, got {0} workstations.", result.Count);
+
+            // and return
             return result;
         }
     }

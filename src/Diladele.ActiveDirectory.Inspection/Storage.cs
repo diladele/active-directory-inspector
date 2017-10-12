@@ -52,6 +52,9 @@ namespace Diladele.ActiveDirectory.Inspection
         {
             // construct path
             string path = GetDiskPath();
+
+            // dump it
+            Trace.TraceInformation("Storage is being loaded from file {0}", path);
             
             // and deserialize it
             var result = new Storage();
@@ -64,10 +67,13 @@ namespace Diladele.ActiveDirectory.Inspection
                     {
                         result = (Storage)serializer.Deserialize(reader);
                     }
+
+                    Trace.TraceInformation("Storage is successfully loaded from file {0}", path);
                 }
                 catch(Exception e)
                 {
-                    // TODO: write to log
+                    Trace.TraceError("Error while loading storage from file {0}. Error: {1}, Stack trace: {2}", path, e.Message, e.StackTrace);
+                    Trace.TraceError("Storage is considered empty because of error above");
                 }
             }
             return result;
@@ -77,6 +83,8 @@ namespace Diladele.ActiveDirectory.Inspection
         {
             string cur_path = GetDiskPath();
             string new_path = cur_path + ".tmp";
+
+            Trace.TraceInformation("Storage is being saved to file {0}", cur_path);
 
             // remove old file
             if (File.Exists(new_path))
@@ -101,6 +109,8 @@ namespace Diladele.ActiveDirectory.Inspection
             if (File.Exists(cur_path))
                 File.Delete(cur_path);
             File.Move(new_path, cur_path);
+
+            Trace.TraceInformation("Storage successfully saved to file {0}", cur_path);
         }
 
         public static Storage Clone(Storage v)

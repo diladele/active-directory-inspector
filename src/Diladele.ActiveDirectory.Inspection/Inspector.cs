@@ -101,6 +101,11 @@ namespace Diladele.ActiveDirectory.Inspection
         //
         private void OnTimerElapsed(Object state)
         {
+            // trace start
+            Trace.TraceInformation("----------------------------------------------");
+            Trace.TraceInformation(" TIMER TICK");
+            Trace.TraceInformation("----------------------------------------------");
+            
             // these are copies of user activity and storage
             List<Activity> activities;
             Storage        storage;

@@ -34,8 +34,8 @@ namespace Diladele.ActiveDirectory.Inspection
         }
 
         private List<Activity> _queue = new List<Activity>();
-        private System.Object      _guard = new System.Object();
-        private EventLog           _log;
+        private System.Object  _guard = new System.Object();
+        private EventLog       _log;
 
         private void OnEntryWritten(object sender, EntryWrittenEventArgs e)
         {
