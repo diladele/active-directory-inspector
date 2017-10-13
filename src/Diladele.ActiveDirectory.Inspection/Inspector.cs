@@ -12,16 +12,14 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     public class Inspector : IDisposable
     {
-        public Inspector(IStorage storage, IHarvester harvester)
+        public Inspector(IStorage storage)
         {
             // debug check
             Debug.Assert(storage != null);
-            Debug.Assert(harvester != null);
             
             // create members
             _guard     = new System.Object();
             _storage   = storage;
-            _harvester = harvester;
             
             // manual events to end the thread (not set) and first time event (set)
             _exitEvent = new ManualResetEvent(false);
@@ -85,7 +83,6 @@ namespace Diladele.ActiveDirectory.Inspection
         //private bool _active = false;
         
         //private Timer      _timer;        
-        private IHarvester _harvester;
         private IStorage   _storage;
 
 
@@ -120,12 +117,10 @@ namespace Diladele.ActiveDirectory.Inspection
                     case WaitHandle.WaitTimeout:
                         {
                             // good, copy out the variables
-                            IHarvester harvester;
                             IStorage   storage;
                             {
                                 lock (_guard)
                                 {
-                                    harvester = _harvester;
                                     storage   = _storage;
                                 }
                             }
@@ -133,7 +128,7 @@ namespace Diladele.ActiveDirectory.Inspection
                             // and run the tick safely
                             try
                             {
-                                OnThreadTick(storage, harvester);
+                                OnThreadTick(storage);
                             }
                             catch (Exception e)
                             {
@@ -154,7 +149,7 @@ namespace Diladele.ActiveDirectory.Inspection
         //
         // may and will through exceptions when needed (wrapped by safe function)
         //
-        private void OnThreadTick(IStorage storage, IHarvester harvester)
+        private void OnThreadTick(IStorage storage)
         {
             /*
              * // mark start

@@ -36,24 +36,14 @@ namespace Diladele.ActiveDirectory.Inspection.Test
 
         static void TestHarvester()
         {
-            using (var harvester = new Harvester())
+            // load storage from disk
+            var storage = StorageFactory.LoadFromDisk();
+
+            // create listener
+            using(var harvester = new Harvester(storage))
             {
-                // wait 10 seconds
-                Thread.Sleep(10000);
-
-                // there should be some workstations as first time harvester runs instantly
-                List<Workstation> workstations = harvester.GetWorkstations();
-                foreach (var workstation in workstations)
-                {
-                    Console.WriteLine(workstation.DnsHostName);
-                }
-
-                // wait another 10 seconds
-                Thread.Sleep(10000);
-
-                // debug check there should not be any workstations as the next harvest will take place in a minute
-                workstations = harvester.GetWorkstations();
-                Debug.Assert(workstations == null || workstations.Count == 0);
+                // wait 100 seconds
+                Thread.Sleep(100 * 1000);
             }
         }
 

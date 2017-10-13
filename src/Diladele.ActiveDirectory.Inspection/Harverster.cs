@@ -3,157 +3,30 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 
 namespace Diladele.ActiveDirectory.Inspection
 {
     //
-    // 
     //
-    public class Harvester : IHarvester, IDisposable
+    //
+    class Workstation
     {
-        public Harvester()
-        {
-            // create guard
-            _guard = new System.Object();
+        public string CommonName;
+        public string DistinguishedName;
+        public string DnsHostName;
+        public Int64  LastLogon;
+        public string Name;
+    }
 
-            // manual event to end the thread (not set) and first time event (set)
-            _exitEvent = new ManualResetEvent(false);
-            _firstTime = new ManualResetEvent(true);
-            
-            // thread itself
-            _thread = new Thread(new ThreadStart(ThreadProc));
-            _thread.Start();            
-        }
-
-        public void Dispose()
-        {
-            // lock the object
-            lock (_guard)
-            {
-                // check if we are already disposed
-                if (_disposed)
-                    return;
-
-                // mark as disposed (actually disposing but anyway)
-                _disposed = true;
-            }
-
-            // copy thread handle to stack variable
-            Thread thread;
-            {
-                lock (_guard)                
-                {
-                    // safely get the thread handle
-                    thread  = _thread;
-                    _thread = null;
-
-                    // tell the thread to stop
-                    _exitEvent.Set();
-                }
-            }
-            
-            // wait for the thread to stop being outside of lock
-            thread.Join();
-            
-            // lock the object
-            lock (_guard)
-            {
-                // debug check
-                Debug.Assert(_disposed == true);
-
-                // and clear all
-                _exitEvent.Dispose();
-                _firstTime.Dispose();
-            }
-        }
-
-        public List<Workstation> GetWorkstations()
-        {
-            List<Workstation> result = null;
-
-            lock (_guard)
-            {
-                result     = _harvested;
-                _harvested = null;
-            }
-            return result;
-        }
-
-        private ManualResetEvent  _exitEvent;
-        private ManualResetEvent  _firstTime;
-        private System.Object     _guard;
-        private Thread            _thread;
-        private bool              _disposed;
-        private List<Workstation> _harvested;
-
-        private void ThreadProc()
-        {
-            // get the events
-            ManualResetEvent exitEvent;
-            ManualResetEvent firstTime;
-            {
-                lock (_guard)
-                {
-                    exitEvent = _exitEvent;
-                    firstTime = _firstTime;
-                }
-            }
-
-            // loop until forever (wake up every 1 minute)
-            while(true)
-            {
-                int res = WaitHandle.WaitAny(new WaitHandle[] { exitEvent, firstTime }, 60 * 1000);
-                switch(res)
-                {
-                    case 1:
-                        {
-                            // it is first time run, reset the event so that it never fires again
-                            firstTime.Reset();
-
-                            // and do the same as on normal timeout
-                            goto case WaitHandle.WaitTimeout;
-                        }
-
-                    case WaitHandle.WaitTimeout:
-                        {
-                            // timeout, do the harvesting
-                            List<Workstation> harvested = OnSafeThreadTick();
-                            if(harvested != null)
-                            {
-                                // save into the parent class
-                                lock (_guard)
-                                {
-                                    _harvested = harvested;
-                                }
-                            }
-                        }
-                        continue;
-
-                    case 0:  break;
-                    default: break;
-                }
-
-                // if we got here, thread need to stop
-                return; 
-            }
-        }
-
-        private List<Workstation> OnSafeThreadTick()
-        {
-            try
-            {
-                return OnThreadTick();
-            }
-            catch(Exception e)
-            {
-                Trace.TraceWarning("Harvester - ignoring harvest error: {0}", e.Message);
-            }
-            return null;
-        }
-
-        private List<Workstation> OnThreadTick()
+    //
+    //
+    //
+    class WorkstationHarvester
+    {
+        public static List<Workstation> Harvest()
         {
             // trace it
             Trace.TraceInformation("Harvester - harvesting LDAP directory....");
@@ -167,7 +40,7 @@ namespace Diladele.ActiveDirectory.Inspection
                 using (DirectorySearcher searcher = new DirectorySearcher(root))
                 {
                     searcher.PropertiesToLoad.AddRange(new[] { "cn", "distinguishedName", "dNSHostName", "lastLogon", "name" });
-                    searcher.PageSize      = 1000;
+                    searcher.PageSize = 1000;
                     searcher.ClientTimeout = new TimeSpan(0, 0, 20);
                     searcher.Filter = "(objectCategory=computer)";
 
@@ -201,6 +74,177 @@ namespace Diladele.ActiveDirectory.Inspection
 
             // and return
             return result;
+        }
+    }
+
+    //
+    //
+    //
+    class WorkstationProber
+    {
+        public static List<Address> Probe(Workstation workstation)
+        {
+            // this is the result
+            List<Address> result = new List<Address>();
+
+            try
+            {
+                // resolve the workstation name, get all addresses from it
+                foreach (IPAddress ip in Dns.GetHostAddresses(workstation.DnsHostName))
+                {
+                    Address address = Prober.Probe(ip);
+                    {
+                        // debug check we have filled in the address itself
+                        Debug.Assert(address.IP == ip);
+                        Debug.Assert(address.Users.Count > 0);
+                        
+                        // assign some other fields for reference
+                        address.DistinguishedName = workstation.DistinguishedName;
+                        address.CommonName        = workstation.CommonName;
+                        address.DnsHostName       = workstation.DnsHostName;
+                        address.LastLogon         = workstation.LastLogon;
+                        address.Name              = workstation.Name;
+                    }
+                    result.Add(address);
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.TraceInformation("WorkstationProber - probe failed for workstation {0}. Error: {1}", workstation.DnsHostName, e.Message);
+            }
+
+            // and return (possibly empty) list
+            return result;
+        }
+
+    }
+
+    //
+    // 
+    //
+    public class Harvester : IDisposable
+    {
+        public Harvester(IStorage storage)
+        {
+            // create guard
+            _guard        = new System.Object();
+            _storage      = storage;
+            _active       = false;
+            _disposed     = false;
+            _workstations = new List<Workstation>();
+            _timer        = new Timer(this.OnTimerElapsedSafe, null, 1000, 250);
+        }
+
+        public void Dispose()
+        {
+            // this is the timer to dispose
+            Timer timer = null;
+
+            // lock the object and check the state
+            lock (_guard)
+            {
+                if (_disposed)
+                    return;
+
+                timer     = _timer;
+                _disposed = true;
+            }
+
+            // this event we use to wait for timer disposal
+            WaitHandle timerDisposed = new AutoResetEvent(false);
+
+            // tell timer to dispose being *outside* the lock
+            timer.Dispose(timerDisposed);
+
+            // wait until all callbacks are completed
+            timerDisposed.WaitOne();
+
+            // lock the object
+            lock (_guard)
+            {
+                // debug check
+                Debug.Assert(_disposed == true);
+            }
+        }
+
+        private System.Object     _guard;
+        private bool              _disposed;
+        private bool              _active;
+        private IStorage          _storage;
+        private Timer             _timer;               // periodic timer runs every minute
+        private List<Workstation> _workstations;        // only timer function has access to this list
+
+        private void OnTimerElapsedSafe(Object state)
+        {
+            // timer may fire even if the previous timer routing is still running, so here we check the flag
+            lock (_guard)
+            {
+                // see if another timer is active, return without doing anything
+                if (_active)
+                    return;
+                
+                // no timers are active, mark us as the running one
+                _active = true;
+            }
+
+            try
+            {
+                // call the exception unsafe routine
+                OnTimerElapsed(state);
+            }
+            finally
+            {
+                // reset the active flag
+                lock (_guard)
+                {
+                    if (_active)
+                        _active = false;
+                }
+            }
+        }
+
+        private void OnTimerElapsed(Object state)
+        {
+            // get next workstation to probe
+            Workstation workstation = null;
+            {
+                lock (_guard)
+                {
+                    if(_workstations.Count > 0)
+                    {
+                        // get one
+                        workstation = _workstations[0];
+
+                        // and pop it
+                        _workstations.RemoveAt(0);
+                    }
+                }
+            }
+
+            // see if we were able to get something
+            if(workstation != null)
+            {
+                // ok we have a workstation to probe, do it
+                List<Address> addresses = WorkstationProber.Probe(workstation);
+                foreach(var address in addresses)
+                {
+                    lock (_guard)
+                    {
+                        _storage.Insert(address);
+                    }
+                }
+            }
+            else
+            {
+                // we do not have any workstations left, issue a call to LDAP server
+                List<Workstation> workstations = WorkstationHarvester.Harvest();
+
+                // and update the list in class
+                lock (_guard)
+                {
+                    _workstations = workstations;
+                }
+            }
         }
     }
 }

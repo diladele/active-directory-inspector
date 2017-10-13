@@ -17,6 +17,9 @@ namespace Diladele.ActiveDirectory.Inspection
         {
             // this is the list of users found on that ip address
             Address result = new Address();
+            {
+                result.IP = address;
+            }
 
             // issue WMI request to the remote IP
             ManagementScope scope = new ManagementScope(@"\\" + address.ToString() + @"\root\cimv2");
