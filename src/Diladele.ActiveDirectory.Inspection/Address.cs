@@ -10,7 +10,7 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     //
     //
-    public class Address : ICloneable
+    public class Address //: ICloneable
     {
         [XmlIgnore]
         public IPAddress  IP;                           // null if not initialized
@@ -32,6 +32,15 @@ namespace Diladele.ActiveDirectory.Inspection
         public DateTime   NextProbeTime;                // default never? 0?
         public List<User> Users = new List<User>();
 
+        // workstation information
+        public string     CommonName;
+        public string     DistinguishedName;        // we consider this to be unique id
+        public string     DnsHostName;
+        public Int64      LastLogon;
+        public string     Name;
+
+
+        /*
         public object Clone()
         {
             Address result = new Address();
@@ -48,6 +57,6 @@ namespace Diladele.ActiveDirectory.Inspection
                 }
             }
             return result;
-        }
+        }*/
     }
 }

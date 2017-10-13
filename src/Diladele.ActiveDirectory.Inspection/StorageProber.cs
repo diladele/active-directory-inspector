@@ -10,6 +10,8 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     // probes the new workstation that was just retrieved from LDAP and does not have any info assocciated 
     //
+
+    /*
     class NewProber
     {
         public static bool Probe(Workstation workstation)
@@ -49,11 +51,13 @@ namespace Diladele.ActiveDirectory.Inspection
             // may be true or false
             return success;
         }
-    }
+    }*/
 
     //
     //
     //
+
+    /*
     class ExistingProber
     {
         public static bool Probe(Workstation workstation)
@@ -65,7 +69,7 @@ namespace Diladele.ActiveDirectory.Inspection
             return NewProber.Probe(workstation);
         }
 
-    }
+    }*/
     
     //
     //
@@ -74,6 +78,7 @@ namespace Diladele.ActiveDirectory.Inspection
     {
         public static void Probe(this Storage storage, Workstation workstation)
         {
+            /*
             // trace it
             Trace.TraceInformation("StorageProber - {0} | starting probe...", workstation.DnsHostName);
 
@@ -132,7 +137,7 @@ namespace Diladele.ActiveDirectory.Inspection
                     // trace failure
                     Trace.TraceInformation("StorageProber - {0} | probe failed for newly harvested workstation. Ignoring it (storage not changed).", workstation.DnsHostName);
                 }
-            }
+            }*/
         }
     }
 

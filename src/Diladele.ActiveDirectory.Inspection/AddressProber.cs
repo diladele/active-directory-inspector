@@ -9,6 +9,8 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     //
     //
+
+    /*
     public static class AddressProber
     {
         public static bool Probe(this Address address)
@@ -17,7 +19,7 @@ namespace Diladele.ActiveDirectory.Inspection
             Debug.Assert(address.IP != null);
 
             // get all users
-            List<User> users = UserProber.Probe(address.IP);
+            List<User> users = Prober.Probe(address.IP);
 
             // see if there were users found
             if (0 == users.Count)
@@ -33,5 +35,5 @@ namespace Diladele.ActiveDirectory.Inspection
             // and return nicely
             return true;
         }
-    }
+    }*/
 }

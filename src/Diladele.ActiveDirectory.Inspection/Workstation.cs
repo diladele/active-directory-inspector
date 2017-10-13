@@ -8,7 +8,7 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     //
     //
-    public class Workstation : ICloneable
+    public class Workstation// : ICloneable
     {
         public string CommonName;
         public string DistinguishedName;        // we consider this to be unique id
@@ -30,6 +30,7 @@ namespace Diladele.ActiveDirectory.Inspection
             }
         }
         
+        /*
         public object Clone()
         {
             Workstation result = new Workstation();
@@ -49,6 +50,6 @@ namespace Diladele.ActiveDirectory.Inspection
                 }
             }
             return result;
-        }
+        }*/
     }
 }

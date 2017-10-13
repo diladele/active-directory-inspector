@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -10,13 +11,40 @@ namespace Diladele.ActiveDirectory.Inspection
 {
     [Serializable]
     [XmlRoot("Storage")]
-    public class Storage
+    public class Data
+    {
+        public List<Workstation> Workstations = new List<Workstation>();
+    }
+
+    //
+    // thread safe object - collection of addresses
+    //
+    public class Storage : IStorage
     {
         public Storage()
         {
-            _workstations = new List<Workstation>();
+            // create members
+            _guard     = new System.Object();
+            _addresses = new List<Address>();
         }
 
+        public void Insert(Address new_address)
+        {
+            lock(_guard)
+            {
+                // throw away the existing one
+                foreach(var address in _addresses)
+                {
+                    if (address.IP == new_address.IP)
+                    {
+                        _addresses.Remove(address);
+                    }   
+                }
+                _addresses.Add(new_address);
+            }
+        }
+
+        /*
         public List<Workstation> Swap(List<Workstation> value)
         {
             Debug.Assert(value != null);
@@ -30,55 +58,20 @@ namespace Diladele.ActiveDirectory.Inspection
                 Storage.SaveToDisk(this);
             }
             return result;
-        }
+        }*/
 
-        private List<Workstation> _workstations;
+        private System.Object _guard;
+        private List<Address> _addresses;
+
+
+        /*
         public List<Workstation> Workstations
         {
-            get { return _workstations; }
-        }
+            get { return _data.Workstations; }
+        }*/
 
-        private static string GetDiskPath()
-        {
-            return Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                "Diladele",
-                "Active Directory Inspector",
-                "storage.xml"
-           );
-        }
 
-        public static Storage LoadFromDisk()
-        {
-            // construct path
-            string path = GetDiskPath();
-
-            // dump it
-            Trace.TraceInformation("Storage is being loaded from file {0}", path);
-            
-            // and deserialize it
-            var result = new Storage();
-            {
-                try
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(Storage));
-
-                    using (StreamReader reader = new StreamReader(path))
-                    {
-                        result = (Storage)serializer.Deserialize(reader);
-                    }
-
-                    Trace.TraceInformation("Storage is successfully loaded from file {0}", path);
-                }
-                catch(Exception e)
-                {
-                    Trace.TraceError("Error while loading storage from file {0}. Error: {1}, Stack trace: {2}", path, e.Message, e.StackTrace);
-                    Trace.TraceError("Storage is considered empty because of error above");
-                }
-            }
-            return result;
-        }
-
+        /*
         public static void SaveToDisk(Storage storage)
         {
             string cur_path = GetDiskPath();
@@ -99,7 +92,7 @@ namespace Diladele.ActiveDirectory.Inspection
             }
 
             // and serialize the storage
-            XmlSerializer ser = new XmlSerializer(typeof(Storage));
+            XmlSerializer ser = new XmlSerializer(typeof(Data));
             using(TextWriter writer = new StreamWriter(new_path))
             {
                 ser.Serialize(writer, storage);
@@ -111,8 +104,9 @@ namespace Diladele.ActiveDirectory.Inspection
             File.Move(new_path, cur_path);
 
             Trace.TraceInformation("Storage successfully saved to file {0}", cur_path);
-        }
+        }*/
 
+        /*
         public static Storage Clone(Storage v)
         {
             Storage result = new Storage();
@@ -127,6 +121,43 @@ namespace Diladele.ActiveDirectory.Inspection
                 }
             }
             return result;
-        }
+        }*/
+
+
+        /*
+        public Workstation Find(IPAddress address)
+        {
+            lock (_guard)
+            {
+                foreach (var w in _data.Workstations)
+                {
+                    foreach (var a in w.Addresses)
+                    {
+                        if (a.IP == address)
+                        {
+                            return (Workstation)w.Clone();
+                        }
+                    }
+                }
+            }
+            return null;
+        }*/
+
+
+        /*
+        public void Add(Workstation v)
+        {
+            lock (_guard)
+            {
+                foreach (var w in _data.Workstations)
+                {
+                    if(w == v)
+                    {
+                        _data.Workstations.Remove(w);
+                        _data.Workstations.Add(v);
+                    }
+                }
+            }
+        }*/
     }
 }

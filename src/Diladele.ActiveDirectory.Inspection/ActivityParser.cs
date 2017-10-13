@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace Diladele.ActiveDirectory.Inspection
@@ -11,18 +12,48 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     class ActivityParser
     {
-        public LoggedOn ParseLogonEvent(EventLogEntry entry)
+        public bool ParseActivity(EventLogEntry entry, Activity activity)
         {
-            var result = new LoggedOn();
+            activity.Logon_ID            = this.GetReplacementString(entry, New_Logon_ID);
+            activity.Logon_GUID          = this.GetReplacementString(entry, New_Logon_GUID);   
+            activity.Network_Address_Raw = this.GetReplacementString(entry, Source_Network_Address); 
+            
+            // if we are unable to parse the network address, there is no use for this activity
+            if (!IPAddress.TryParse(activity.Network_Address_Raw, out activity.Network_Address))
             {
-                result.Security_ID     = this.GetReplacementString(entry, New_Logon_Security_ID);
-                result.Account_Name    = this.GetReplacementString(entry, New_Logon_Account_Name);
-                result.Account_Domain  = this.GetReplacementString(entry, New_Logon_Account_Domain);
-                result.Logon_ID        = this.GetReplacementString(entry, New_Logon_ID);
-                result.Logon_GUID      = this.GetReplacementString(entry, New_Logon_GUID);                
-                result.Logon_Type      = this.ParseLogonType(entry);                
-                result.Network_Address = this.GetReplacementString(entry, Source_Network_Address);
+                return false;
             }
+            return true;
+        }
+
+        public bool ParseLogon(EventLogEntry entry, LoggedOn logon)
+        {
+            if (!ParseActivity(entry, logon))
+                return false;
+
+            logon.Security_ID    = this.GetReplacementString(entry, New_Logon_Security_ID);
+            logon.Account_Name   = this.GetReplacementString(entry, New_Logon_Account_Name);
+            logon.Account_Domain = this.GetReplacementString(entry, New_Logon_Account_Domain);
+            logon.Logon_Type     = this.ParseLogonType(entry);                
+                
+                
+                
+
+                // local or invalid network address are not interesting
+                //if (result.Network_Address_Raw == "-" || result.Network_Address_Raw == "::1")
+                //{
+                  //  result.Local = true;
+                //}
+                //else
+                //{
+                  //  result.Local = false;
+                //}
+            
+
+            
+
+            
+
 
             // subject info (the one who performed this operation)
             // Security_ID       = GetReplacementString(entry, Security_ID)
@@ -54,7 +85,7 @@ namespace Diladele.ActiveDirectory.Inspection
                 string replacementString = entry.ReplacementStrings[index];
                 Console.WriteLine("ReplacementString {0}:{1}", index, replacementString);
             }*/
-            return result;
+            return true;
         }
 
         private LoggedOn.LogonType ParseLogonType(EventLogEntry entry)

@@ -44,16 +44,17 @@
   <ItemGroup>
     <Compile Include="Address.cs" />
     <Compile Include="AddressProber.cs" />
+    <Compile Include="Interfaces.cs" />
+    <Compile Include="StorageFactory.cs" />
     <Compile Include="StorageProber.cs" />
     <Compile Include="ActivityParser.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="Harverster.cs" />
     <Compile Include="Inspector.cs" />
     <Compile Include="Activity.cs" />
-    <Compile Include="UserProber.cs" />
+    <Compile Include="Prober.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storage.cs" />
-    <Compile Include="StorageUpdater.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Workstation.cs" />
   </ItemGroup>
