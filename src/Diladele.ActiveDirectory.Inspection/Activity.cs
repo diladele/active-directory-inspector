@@ -13,7 +13,7 @@ namespace Diladele.ActiveDirectory.Inspection
 
     }
 
-    class LoggedOn : Activity
+    public class LoggedOn : Activity
     {
         public enum LogonType
         {
@@ -38,7 +38,7 @@ namespace Diladele.ActiveDirectory.Inspection
         public LogonType Logon_Type;        
     }
 
-    class LoggedOff : Activity
+    public class LoggedOff : Activity
     {
     }
 }

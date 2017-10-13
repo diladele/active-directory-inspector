@@ -84,7 +84,7 @@ namespace Diladele.ActiveDirectory.Inspection
             string cur_path = GetDiskPath();
             string new_path = cur_path + ".tmp";
 
-            Trace.TraceInformation("Storage is being saved to file {0}", cur_path);
+            Trace.TraceInformation("Storage (workstation count {0}) is being saved to file {1}", storage.Workstations.Count, cur_path);
 
             // remove old file
             if (File.Exists(new_path))

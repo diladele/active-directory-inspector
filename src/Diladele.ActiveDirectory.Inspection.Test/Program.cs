@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -9,8 +11,21 @@ namespace Diladele.ActiveDirectory.Inspection.Test
 {
     class Program
     {
+        private static string GetDiskPath()
+        {
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                "Diladele",
+                "Active Directory Inspector",
+                "application.log"
+           );
+        }
+
         static void Main(string[] args)
         {
+            Trace.Listeners.Add(new TextWriterTraceListener(GetDiskPath()));
+            Trace.AutoFlush = true;
+
             //TestHarvester();
             TestInspector();
             //TestEventLogListener();

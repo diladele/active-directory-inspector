@@ -101,53 +101,61 @@ namespace Diladele.ActiveDirectory.Inspection
         //
         private void OnTimerElapsed(Object state)
         {
+            // mark start
+            DateTime start = DateTime.Now;
+
             // trace start
             Trace.TraceInformation("----------------------------------------------");
-            Trace.TraceInformation(" TIMER TICK");
+            Trace.TraceInformation(" TIMER TICK START at {0}", start.ToString());
             Trace.TraceInformation("----------------------------------------------");
             
-            // these are copies of user activity and storage
-            List<Activity> activities;
-            Storage        storage;
+            // the following activities are quick so do them *within* the lock
+            lock (_guard)
             {
-                lock (_guard)
-                {
-                    activities = _listener.GetActivities();
-                    storage    = Storage.Clone(_storage);
-                }
+                // get the logon/logoff activities and update the storage
+                _storage.Update(_listener.GetActivities());
             }
 
-            // we have some event log records, adjust the storage based on each (quick)
-            storage.Update(activities);
-
-            // harvest workstations (quick)
+            // harvest workstations (quick) being outside of lock
             var workstations = Harvester.Harvest();
 
             // now probe each workstation (slow)
-            foreach(var workstation in workstations)
+            foreach (var workstation in workstations)
             {
-                // each update may take a lot of time, so check for bail out
+                // make a local clone of the storage                
+                Storage storage = null;
+
+                // lock the object
                 lock (_guard)
                 {
-                    if(_stopping)
+                    // each probe may take a lot of time, so check for bail out
+                    if (_stopping)
                         return;
+
+                    // clone it
+                    storage = Storage.Clone(_storage);
                 }
 
-                // probe and possible add to data
+                // probe and possible add to data (take a lot of time!)
                 storage.Probe(workstation);
+
+                // ok probe completed, refresh the main storage right now so that possible callers get a fresh view
+                lock (_guard)
+                {
+                    // swap the data in the class
+                    _storage = storage;
+
+                    // and save it on disk
+                    Storage.SaveToDisk(_storage);
+                }
             }
 
-            // finally if we got here then everything in data is fresh and probed, replace it
-            lock (_guard)
-            {
-                // swap the data in the class
-                _storage = storage;
+            // mark end
+            DateTime end = DateTime.Now;
 
-                // and save it on disk
-                Storage.SaveToDisk(_storage);
-            }
-
-            // fine, let's wait for the next timer fire
+            Trace.TraceInformation("----------------------------------------------");
+            Trace.TraceInformation(" TIMER TICK END at {0}, took: {1}", end.ToString(), (end - start).ToString());
+            Trace.TraceInformation("----------------------------------------------");
         }
     }
 }
