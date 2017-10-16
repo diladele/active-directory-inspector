@@ -93,18 +93,25 @@ namespace Diladele.ActiveDirectory.Inspection
                 foreach (IPAddress ip in Dns.GetHostAddresses(workstation.DnsHostName))
                 {
                     Address address = Prober.Probe(ip);
+                    
+                    if (address.Users.Count == 0)
                     {
-                        // debug check we have filled in the address itself
-                        Debug.Assert(address.IP == ip);
-                        Debug.Assert(address.Users.Count > 0);
-                        
-                        // assign some other fields for reference
-                        address.DistinguishedName = workstation.DistinguishedName;
-                        address.CommonName        = workstation.CommonName;
-                        address.DnsHostName       = workstation.DnsHostName;
-                        address.LastLogon         = workstation.LastLogon;
-                        address.Name              = workstation.Name;
+                        // there are no one logged on on that IP, skip it then
+                        continue; ;
                     }
+
+                    // debug check we have filled in the address itself
+                    Debug.Assert(address.IP == ip);
+                    Debug.Assert(address.Users.Count > 0);
+                    
+                    // assign some other fields for reference
+                    address.DistinguishedName = workstation.DistinguishedName;
+                    address.CommonName        = workstation.CommonName;
+                    address.DnsHostName       = workstation.DnsHostName;
+                    address.LastLogon         = workstation.LastLogon;
+                    address.Name              = workstation.Name;
+
+                    // and add this address
                     result.Add(address);
                 }
             }

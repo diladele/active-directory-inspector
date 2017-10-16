@@ -29,6 +29,27 @@ namespace Diladele.ActiveDirectory.Inspection
             }
         }
 
+        public Address Clone()
+        {
+            Address result = new Address();
+            {
+                result.IP                = this.IP;
+                result.CommonName        = this.CommonName;
+                result.DistinguishedName = this.DistinguishedName;
+                result.DnsHostName       = this.DnsHostName;
+                result.LastLogon         = this.LastLogon;
+                result.Name              = this.Name;
+                
+                result.Users = new List<User>();
+                foreach(var user in this.Users)
+                {
+                    result.Users.Add((User)user.Clone());
+                }
+            }
+            return result;
+
+        }
+
         // public DateTime   NextProbeTime;                // default never? 0?
         public List<User> Users = new List<User>();
 

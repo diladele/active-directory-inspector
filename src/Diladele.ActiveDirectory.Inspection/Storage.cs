@@ -15,6 +15,8 @@ namespace Diladele.ActiveDirectory.Inspection
     public interface IStorage
     {
         void Insert(Address a);
+        bool Find(string ip, out string user);
+        bool Dump(out List<Address> addresses);
     }
 
 
@@ -37,18 +39,45 @@ namespace Diladele.ActiveDirectory.Inspection
             lock(_guard)
             {
                 // throw away the existing one
-                foreach(var address in _addresses)
+                _addresses.RemoveAll(item => item.IP.Equals(new_address.IP));
+
+                // debug check
+                foreach (var address in _addresses)
                 {
-                    if (address.IP == new_address.IP)
+                    if (address.IP.Equals(new_address.IP))
                     {
-                        _addresses.Remove(address);
-                    }   
+                        Debug.Assert(false);
+                    }
                 }
+
+                // and add it again
                 _addresses.Add(new_address);
             }
         }
 
+        public bool Find(string ip, out string user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Dump(out List<Address> addresses)
+        {
+            addresses = new List<Address>();
+
+            lock (_guard)
+            {
+                foreach (var address in _addresses)
+                {
+                    addresses.Add(address.Clone());
+                }
+            }
+            return true;
+        }
+
         private System.Object _guard;
         private List<Address> _addresses;
+
+
+        
     }
 }
