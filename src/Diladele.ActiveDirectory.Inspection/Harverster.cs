@@ -133,6 +133,8 @@ namespace Diladele.ActiveDirectory.Inspection
     {
         public Harvester(IStorage storage)
         {
+            log.Info("Creating a new LDAP harvester...");
+
             // create guard
             _guard        = new System.Object();
             _storage      = storage;
@@ -144,6 +146,8 @@ namespace Diladele.ActiveDirectory.Inspection
 
         public void Dispose()
         {
+            log.Info("LDAP harvester is being disposed...");
+
             // this is the timer to dispose
             Timer timer = null;
 
@@ -196,8 +200,14 @@ namespace Diladele.ActiveDirectory.Inspection
 
             try
             {
+                // dump start
+                log.Debug("LDAP harvester timer elapsed, starting processing...");
+
                 // call the exception unsafe routine
                 OnTimerElapsed(state);
+
+                // dump end
+                log.Debug("LDAP harvester timer completed.");
             }
             finally
             {
@@ -231,10 +241,14 @@ namespace Diladele.ActiveDirectory.Inspection
             // see if we were able to get something
             if(workstation != null)
             {
+                log.DebugFormat("Probing workstation {0}.", workstation.DnsHostName);
+
                 // ok we have a workstation to probe, do it
                 List<Address> addresses = WorkstationProber.Probe(workstation);
                 foreach(var address in addresses)
                 {
+                    log.DebugFormat("Workstation {0} will be added with address {1}.", workstation.DnsHostName, address.AsString);
+
                     lock (_guard)
                     {
                         _storage.Insert(address);
@@ -253,5 +267,7 @@ namespace Diladele.ActiveDirectory.Inspection
                 }
             }
         }
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
     }
 }

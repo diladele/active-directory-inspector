@@ -74,10 +74,18 @@ namespace Diladele.ActiveDirectory.Inspection
             return true;
         }
 
+        public string ToXmlString()
+        {
+            XmlSerializer ser = new XmlSerializer(typeof(Storage));
+
+            using (StringWriter textWriter = new StringWriter())
+            {
+                ser.Serialize(textWriter, this);
+                return textWriter.ToString();
+            }
+        }
+
         private System.Object _guard;
         private List<Address> _addresses;
-
-
-        
     }
 }

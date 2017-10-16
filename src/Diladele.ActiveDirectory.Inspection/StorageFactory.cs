@@ -22,7 +22,7 @@ namespace Diladele.ActiveDirectory.Inspection
             string path = GetDiskPath();
 
             // dump it
-            Trace.TraceInformation("Storage is loaded from file {0}.", path);
+            log.InfoFormat("Storage is being loaded from file {0}.", path);
 
             // and deserialize it
             try
@@ -36,22 +36,18 @@ namespace Diladele.ActiveDirectory.Inspection
             }
             catch (Exception e)
             {
-                Trace.TraceError("Error while loading storage from file {0}. Error: {1}, Stack trace: {2}", path, e.Message, e.StackTrace);
-                Trace.TraceError("Storage is considered empty because of error above");
+                log.ErrorFormat("Error while loading storage from file {0}. Error: {1}", path, e.Message);
+                log.ErrorFormat("Storage is considered empty because of error above");
             }
             return storage;
         }
 
-
-
-
-        /*
         public static void SaveToDisk(Storage storage)
         {
             string cur_path = GetDiskPath();
             string new_path = cur_path + ".tmp";
 
-            Trace.TraceInformation("Storage (workstation count {0}) is being saved to file {1}", storage.Workstations.Count, cur_path);
+            log.InfoFormat("Storage is being saved to file {1}", cur_path);
 
             // remove old file
             if (File.Exists(new_path))
@@ -65,20 +61,16 @@ namespace Diladele.ActiveDirectory.Inspection
                 Directory.CreateDirectory(Path.GetDirectoryName(new_path));
             }
 
-            // and serialize the storage
-            XmlSerializer ser = new XmlSerializer(typeof(Data));
-            using(TextWriter writer = new StreamWriter(new_path))
-            {
-                ser.Serialize(writer, storage);
-            }
+            // write the xml serialized storage
+            File.WriteAllText(new_path, storage.ToXmlString());
 
             // good now move the new file into the old one
             if (File.Exists(cur_path))
                 File.Delete(cur_path);
             File.Move(new_path, cur_path);
 
-            Trace.TraceInformation("Storage successfully saved to file {0}", cur_path);
-        }*/
+            log.InfoFormat("Storage successfully saved to file {0}", cur_path);
+        }
 
         private static string GetDiskPath()
         {
@@ -89,5 +81,9 @@ namespace Diladele.ActiveDirectory.Inspection
                 "storage.xml"
            );
         }
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        
     }
 }

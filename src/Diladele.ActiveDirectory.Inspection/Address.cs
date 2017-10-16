@@ -59,5 +59,20 @@ namespace Diladele.ActiveDirectory.Inspection
         public string     DnsHostName;
         public Int64      LastLogon;
         public string     Name;
+
+        public string AsString
+        {
+            get
+            {
+                string users = "";
+                {
+                    foreach(var user in this.Users)
+                    {
+                        users += string.Format(@" {0}\{1}", user.Domain, user.Name);
+                    }
+                }
+                return string.Format("IP {0}, User Count: {1}, Users:{2}", this.IP.ToString(), this.Users.Count, users);
+            }
+        }
     }
 }
