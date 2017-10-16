@@ -11,31 +11,21 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     public class Listener
     {
-        public Listener()
+        public Listener(IStorage storage)
         {
-            _log = new EventLog("Security");
+            _guard   = new System.Object();
+            _storage = storage;
+            _log     = new EventLog("Security");
             {
                 _log.EntryWritten += new EntryWrittenEventHandler(OnEntryWritten);
                 _log.EnableRaisingEvents = true;                
             }
         }
 
-        public List<Activity> GetActivities()
-        {
-            List<Activity> result = null;
-
-            lock (_guard)
-            {
-                result = _queue;
-                _queue = new List<Activity>();
-            }
-
-            return result;
-        }
-
-        private List<Activity> _queue = new List<Activity>();
-        private System.Object      _guard = new System.Object();
-        private EventLog           _log;
+        //private List<Activity> _queue = new List<Activity>();
+        private System.Object  _guard;
+        private IStorage       _storage;
+        private EventLog       _log;
 
         private void OnEntryWritten(object sender, EntryWrittenEventArgs e)
         {
@@ -52,6 +42,8 @@ namespace Diladele.ActiveDirectory.Inspection
                             HandleLogonEvent(entry);
                             break;
 
+                            /*
+
                         case 4634:
                             HandleLogoffEvent(entry);
                             break;
@@ -59,6 +51,7 @@ namespace Diladele.ActiveDirectory.Inspection
                         case 4647:
                             HandleUserInitiatedLogoffEvent(entry);
                             break;
+                             * */
 
                         default:
                             break;
@@ -66,7 +59,7 @@ namespace Diladele.ActiveDirectory.Inspection
                 }
                 catch (Exception e1)
                 {
-                    Debug.Write(e1.Message);
+                    Trace.TraceWarning(e1.Message);
                 }
             }
         }
@@ -74,6 +67,9 @@ namespace Diladele.ActiveDirectory.Inspection
         private void HandleUserInitiatedLogoffEvent(EventLogEntry entry)
         {
  	        //throw new NotImplementedException();
+            //Trace.TraceInformation(
+             //           "Updater - processed logoff activity on IP {0}.", activity.Network_Address
+              //      );
         }
 
         private void HandleLogoffEvent(EventLogEntry entry)
@@ -83,10 +79,36 @@ namespace Diladele.ActiveDirectory.Inspection
 
         private void HandleLogonEvent(EventLogEntry entry)
         {
-            LoggedOn activity = (new ActivityParser()).ParseLogonEvent(entry);
+            // get the activity
+            LoggedOn activity = new LoggedOn();
             {
-                _queue.Add(activity);
+                var parser = new ActivityParser();
+                {
+                    if(!parser.ParseLogon(entry, activity))
+                        return;
+                }
             }
+
+            // local activities are not interesting
+            if (activity.Local)
+                return;
+            
+            // when there is a logon, we *always* do probing
+            Address address = Prober.Probe(activity.Network_Address);
+            
+            if(address != null)
+            {
+                // we probed successfully, update the storage
+                _storage.Insert(address);
+            }
+
+            // and trace it
+            Trace.TraceInformation(
+                "Updater - processed logon activity of {0}\\{1} on {2}",
+                activity.Account_Domain,
+                activity.Account_Name,
+                activity.Network_Address
+            );
         }
     }
 }

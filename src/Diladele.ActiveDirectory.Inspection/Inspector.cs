@@ -12,137 +12,205 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     public class Inspector : IDisposable
     {
-        public Inspector()
+        public Inspector(IStorage storage)
         {
-            // load the storage from disk
-            lock (_guard)
-            {
-                // load existing storage from disk
-                _storage = Storage.LoadFromDisk();
+            // debug check
+            Debug.Assert(storage != null);
+            
+            // create members
+            _guard     = new System.Object();
+            _storage   = storage;
+            
+            // manual events to end the thread (not set) and first time event (set)
+            _exitEvent = new ManualResetEvent(false);
+            _firstTime = new ManualResetEvent(true);
 
-                // construct the event log listener
-                _listener = new Listener();
-            }
-
-            // and start the timer
-            _timer = new Timer(this.OnTimerElapsedSafe, null, 1000, 250);
+            // thread itself
+            _thread = new Thread(new ThreadStart(ThreadProc));
+            _thread.Start();
         }
 
         public void Dispose()
         {
-            Timer timer = null;
-            {
-                lock (_guard)
-                {
-                    // mark as stopping
-                    _stopping = true;
-
-                    // and get the timer
-                    timer  = _timer;
-                    _timer = null;
-                }
-            }
-
-            // stop the timer being OUTSIDE of lock
-            timer.Dispose();
-
-            // lock us again 
+            // lock the object
             lock (_guard)
             {
-                // and clean up
-                _listener   = null;                
+                // check if we are already disposed
+                if (_disposed)
+                    return;
+
+                // mark as disposed (actually disposing but anyway)
+                _disposed = true;
+            }
+
+            // copy thread handle to stack variable
+            Thread thread;
+            {
+                lock (_guard)                
+                {
+                    // safely get the thread handle
+                    thread  = _thread;
+                    _thread = null;
+
+                    // tell the thread to stop
+                    _exitEvent.Set();
+                }
+            }
+            
+            // wait for the thread to stop being outside of lock
+            thread.Join();
+            
+            // lock the object
+            lock (_guard)
+            {
+                // debug check
+                Debug.Assert(_disposed == true);
+
+                // and clear all
+                _exitEvent.Dispose();
+                _firstTime.Dispose();
             }
         }
 
-        private System.Object _guard = new System.Object();
-        private Storage    _storage  = new Storage();
-        private bool _stopping = false;
-        private bool _active = false;
+        private ManualResetEvent _exitEvent;
+        private ManualResetEvent _firstTime;
+        private System.Object _guard;
+        private Thread _thread;
+        private bool _disposed;
+
+        //private Storage    _storage  = new Storage();
+        //private bool _stopping = false;
+        //private bool _active = false;
         
-        private Timer    _timer;        
-        private Listener _listener;
-        
-        
-        private void OnTimerElapsedSafe(Object state)
+        //private Timer      _timer;        
+        private IStorage   _storage;
+
+
+        private void ThreadProc()
         {
-            // timer may fire even if the previous timer routing is still running, so here we check the flag
-            lock (_guard)
+            // get the events
+            ManualResetEvent exitEvent;
+            ManualResetEvent firstTime;
             {
-                if(_active)
+                lock (_guard)
                 {
-                    // ok another timer is active, return without doing anything
-                    return;
-                }
-                else
-                {
-                    // no timers are active, mark us as the running one
-                    _active = true;
+                    exitEvent = _exitEvent;
+                    firstTime = _firstTime;
                 }
             }
 
-            try
+            // loop until forever (wake up every 15 seconds)
+            while(true)
             {
-                // call the exception unsafe routine
-                OnTimerElapsed(state);
-            }
-            finally
-            {
-                // reset the active flag
-                lock (_guard)
+                int res = WaitHandle.WaitAny(new WaitHandle[] { exitEvent, firstTime }, 15* 1000);
+                switch(res)
                 {
-                    if (_active)
-                        _active = false;
+                    case 1:
+                        {
+                            // it is first time run, reset the event so that it never fires again
+                            firstTime.Reset();
+
+                            // and do the same as on normal timeout
+                            goto case WaitHandle.WaitTimeout;
+                        }
+
+                    case WaitHandle.WaitTimeout:
+                        {
+                            // good, copy out the variables
+                            IStorage   storage;
+                            {
+                                lock (_guard)
+                                {
+                                    storage   = _storage;
+                                }
+                            }
+
+                            // and run the tick safely
+                            try
+                            {
+                                OnThreadTick(storage);
+                            }
+                            catch (Exception e)
+                            {
+                                Trace.TraceWarning("Inspector - ignoring error: {0}", e.Message);
+                            }
+                        }
+                        continue;
+
+                    case 0:  break;
+                    default: break;
                 }
+
+                // if we got here, thread need to stop
+                return; 
             }
         }
 
         //
         // may and will through exceptions when needed (wrapped by safe function)
         //
-        private void OnTimerElapsed(Object state)
+        private void OnThreadTick(IStorage storage)
         {
-            // these are copies of user activity and storage
-            List<Activity> activities;
-            Storage        storage;
+            /*
+             * // mark start
+            DateTime start = DateTime.Now;
+
+            // trace start
+            Trace.TraceInformation("----------------------------------------------");
+            Trace.TraceInformation(" TIMER TICK START at {0}", start.ToString());
+            Trace.TraceInformation("----------------------------------------------");
+            
+            // get the logon/logoff activities and update the storage
+            List<Activity> activities = listener.PopActivities();
             {
-                lock (_guard)
-                {
-                    activities = _listener.GetActivities();
-                    storage    = Storage.Clone(_storage);
-                }
+                (new Updater(storage)).Update(activities);
             }
 
-            // we have some event log records, adjust the storage based on each (quick)
-            storage.Update(activities);
+            // now the storage is updated with event log activities, some workstations *may* have beed marked probe now, let's do the probing
+            
 
-            // harvest workstations (quick)
+            // harvest workstations (quick) being outside of lock
             var workstations = Harvester.Harvest();
 
             // now probe each workstation (slow)
-            foreach(var workstation in workstations)
+            foreach (var workstation in workstations)
             {
-                // each update may take a lot of time, so check for bail out
+                // make a local clone of the storage                
+                Storage storage = null;
+
+                // lock the object
                 lock (_guard)
                 {
-                    if(_stopping)
+                    // each probe may take a lot of time, so check for bail out
+                    if (_stopping)
                         return;
+
+                    // clone it
+                    storage = Storage.Clone(_storage);
                 }
 
-                // probe and possible add to data
+                // probe and possible add to data (take a lot of time!)
                 storage.Probe(workstation);
+
+                // ok probe completed, refresh the main storage right now so that possible callers get a fresh view
+                lock (_guard)
+                {
+                    // swap the data in the class
+                    _storage = storage;
+
+                    // and save it on disk
+                    Storage.SaveToDisk(_storage);
+                }
             }
+             * * */
 
-            // finally if we got here then everything in data is fresh and probed, replace it
-            lock (_guard)
-            {
-                // swap the data in the class
-                _storage = storage;
+            // mark end
+            DateTime end = DateTime.Now;
 
-                // and save it on disk
-                Storage.SaveToDisk(_storage);
-            }
-
-            // fine, let's wait for the next timer fire
+            Trace.TraceInformation("----------------------------------------------");
+            //Trace.TraceInformation(" TIMER TICK END at {0}, took: {1}", end.ToString(), (end - start).ToString());
+            Trace.TraceInformation("----------------------------------------------");
+             
         }
     }
 }

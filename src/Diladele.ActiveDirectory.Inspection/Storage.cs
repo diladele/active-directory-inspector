@@ -3,120 +3,81 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Xml.Serialization;
 
 namespace Diladele.ActiveDirectory.Inspection
 {
+    //
+    //
+    //
+    public interface IStorage
+    {
+        void Insert(Address a);
+        bool Find(string ip, out string user);
+        bool Dump(out List<Address> addresses);
+    }
+
+
+    //
+    // thread safe object - collection of addresses
+    //
     [Serializable]
     [XmlRoot("Storage")]
-    public class Storage
+    public class Storage : IStorage
     {
         public Storage()
         {
-            _workstations = new List<Workstation>();
+            // create members
+            _guard     = new System.Object();
+            _addresses = new List<Address>();
         }
 
-        public List<Workstation> Swap(List<Workstation> value)
+        public void Insert(Address new_address)
         {
-            Debug.Assert(value != null);
-
-            List<Workstation> result;
+            lock(_guard)
             {
-                result        = _workstations;
-                _workstations = value;
+                // throw away the existing one
+                _addresses.RemoveAll(item => item.IP.Equals(new_address.IP));
 
-                // swap ALWAYS saves data to disk
-                Storage.SaveToDisk(this);
-            }
-            return result;
-        }
-
-        private List<Workstation> _workstations;
-        public List<Workstation> Workstations
-        {
-            get { return _workstations; }
-        }
-
-        private static string GetDiskPath()
-        {
-            return Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                "Diladele",
-                "Active Directory Inspector",
-                "storage.xml"
-           );
-        }
-
-        public static Storage LoadFromDisk()
-        {
-            // construct path
-            string path = GetDiskPath();
-            
-            // and deserialize it
-            var result = new Storage();
-            {
-                try
+                // debug check
+                foreach (var address in _addresses)
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(Storage));
-
-                    using (StreamReader reader = new StreamReader(path))
+                    if (address.IP.Equals(new_address.IP))
                     {
-                        result = (Storage)serializer.Deserialize(reader);
+                        Debug.Assert(false);
                     }
                 }
-                catch(Exception e)
+
+                // and add it again
+                _addresses.Add(new_address);
+            }
+        }
+
+        public bool Find(string ip, out string user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Dump(out List<Address> addresses)
+        {
+            addresses = new List<Address>();
+
+            lock (_guard)
+            {
+                foreach (var address in _addresses)
                 {
-                    // TODO: write to log
+                    addresses.Add(address.Clone());
                 }
             }
-            return result;
+            return true;
         }
 
-        public static void SaveToDisk(Storage storage)
-        {
-            string cur_path = GetDiskPath();
-            string new_path = cur_path + ".tmp";
+        private System.Object _guard;
+        private List<Address> _addresses;
 
-            // remove old file
-            if (File.Exists(new_path))
-            {
-                File.Delete(new_path);
-            }
 
-            // recreate folder if it does not exist
-            if(!Directory.Exists(Path.GetDirectoryName(new_path)))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(new_path));
-            }
-
-            // and serialize the storage
-            XmlSerializer ser = new XmlSerializer(typeof(Storage));
-            using(TextWriter writer = new StreamWriter(new_path))
-            {
-                ser.Serialize(writer, storage);
-            }
-
-            // good now move the new file into the old one
-            if (File.Exists(cur_path))
-                File.Delete(cur_path);
-            File.Move(new_path, cur_path);
-        }
-
-        public static Storage Clone(Storage v)
-        {
-            Storage result = new Storage();
-            {
-                // clone all simple members (we have none)
-
-                // and manually clone the  list
-                result._workstations = new List<Workstation>();
-                foreach(var workstation in v._workstations)
-                {
-                    result._workstations.Add((Workstation)workstation.Clone());
-                }
-            }
-            return result;
-        }
+        
     }
 }

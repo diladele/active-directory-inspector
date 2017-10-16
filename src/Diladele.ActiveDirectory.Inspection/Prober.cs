@@ -11,12 +11,15 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     //
     //
-    public class UserProber
+    public class Prober
     {
-        public static List<User> Probe(IPAddress address)
+        public static Address Probe(IPAddress address)
         {
             // this is the list of users found on that ip address
-            List<User> result = new List<User>();
+            Address result = new Address();
+            {
+                result.IP = address;
+            }
 
             // issue WMI request to the remote IP
             ManagementScope scope = new ManagementScope(@"\\" + address.ToString() + @"\root\cimv2");
@@ -30,11 +33,11 @@ namespace Diladele.ActiveDirectory.Inspection
                     if (!processName.EndsWith("explorer.exe"))
                         continue;
 
-                    User user = UserProber.ConstructUser(mo);
+                    User user = Prober.ConstructUser(mo);
                     {
                         user.DebugProbedIpAddress = address.ToString();
                     }
-                    result.Add(user);
+                    result.Users.Add(user);
                 }
             }
 

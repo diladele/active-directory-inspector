@@ -10,7 +10,7 @@ namespace Diladele.ActiveDirectory.Inspection
     //
     //
     //
-    public class Address : ICloneable
+    public class Address
     {
         [XmlIgnore]
         public IPAddress  IP;                           // null if not initialized
@@ -29,25 +29,35 @@ namespace Diladele.ActiveDirectory.Inspection
             }
         }
 
-        public DateTime   NextProbeTime;                // default never? 0?
-        public List<User> Users = new List<User>();
-
-        public object Clone()
+        public Address Clone()
         {
             Address result = new Address();
             {
-                // copy all simple members
-                result.IP = this.IP;
-                result.NextProbeTime = this.NextProbeTime;
+                result.IP                = this.IP;
+                result.CommonName        = this.CommonName;
+                result.DistinguishedName = this.DistinguishedName;
+                result.DnsHostName       = this.DnsHostName;
+                result.LastLogon         = this.LastLogon;
+                result.Name              = this.Name;
                 
-                // copy list
                 result.Users = new List<User>();
-                foreach (var user in this.Users)
+                foreach(var user in this.Users)
                 {
                     result.Users.Add((User)user.Clone());
                 }
             }
             return result;
+
         }
+
+        // public DateTime   NextProbeTime;                // default never? 0?
+        public List<User> Users = new List<User>();
+
+        // debugging information about the workstation this address is from (empty if address was created from event log notification)
+        public string     CommonName;
+        public string     DistinguishedName;
+        public string     DnsHostName;
+        public Int64      LastLogon;
+        public string     Name;
     }
 }
