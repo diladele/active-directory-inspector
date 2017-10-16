@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" 
+     xmlns:difx="http://schemas.microsoft.com/wix/DifxAppExtension"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" 
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <?define var.product_id          = "{329B0DB0-4636-46EB-94DB-56A79AFC9750}"?>
+    <?define var.product_ucode       = "{827E9DBD-C9B9-4B52-A752-C771BD2EC3B1}"?>
+    <?define var.product_name        = "Active Directory Inspector"?>
+    <?define var.product_menu        = "Active Directory Inspector"?>
+    <?define var.product_desc        = "Active Directory Inspector - IP to user name mapper to be used by Web Safety ICAP web filter for Squid (version $(var.VERSION), revision $(var.REVISION) for platform $(var.PLATFORM))"?>
+    <?define var.product_contact     = "support@diladele.com"?>
+    <?define var.product_support     = "support@diladele.com"?>
+    <?define var.reg_path            = "Software\Diladele\Active Directory Inspector\1.0"?>
+    <?define var.product_lang        = "1033"?>
+    <?define var.manufacturer        = "Diladele B.V."?>
+    <?define var.manufacturer_url    = "https://www.diladele.com"?>
+    <?define var.service_name        = "wsadi"?>
+    <?define var.service_displayname = "$(var.product_name)"?>
+    <?define var.service_desc        = "Enumerates all workstations in the Active Directory and maps IP address to user name currently logged in on that IP"?>
+
+    <?if $(var.PLATFORM) = x64 ?>
+        <?define var.Is64Bit  = "yes"?>
+        <?define var.Platform = "x64"?>
+        <?define var.ProgramFilesDir = "ProgramFiles64Folder"?>        
+    <?else ?>
+        <?define var.Is64Bit  = "no"?>
+        <?define var.Platform = "x86"?>
+        <?define var.ProgramFilesDir = "ProgramFilesFolder"?>        
+    <?endif ?>            
+        
+    <Product 
+        Id="$(var.product_id)" 
+        UpgradeCode="$(var.product_ucode)" 
+        Name="$(var.product_name)" 
+        Language="$(var.product_lang)" 
+        Codepage='$(var.codepage)' 
+        Version="$(var.VERSION)"  
+        Manufacturer="Diladele B.V.">
+        
+        <Package Id="*" 
+            Compressed="yes"
+            Comments="This installer database contains the logic and data required to install Active Directory Inspector by Diladele B.V."
+            Description="$(var.product_desc)"
+            InstallerVersion="400" 
+            InstallScope="perMachine"  
+            Platform="$(var.Platform)"
+            Languages='1033,1049'
+            SummaryCodepage='$(var.codepage)'
+        />
+        
+        <MajorUpgrade AllowDowngrades="no" DowngradeErrorMessage="A newer version of this application is already installed."/>        
+        <Condition Message="This application runs only on Windows 7 and above.">VersionNT >= 601</Condition>
+        
+        <Property Id='ARPCONTACT'>$(var.product_contact)</Property>
+        <Property Id='ARPHELPLINK'>$(var.manufacturer_url)</Property>
+        <Property Id='ARPURLINFOABOUT'>$(var.manufacturer_url)</Property>
+        <Property Id='ARPURLUPDATEINFO'>$(var.manufacturer_url)</Property>
+        <Property Id='ARPHELPTELEPHONE'>$(var.product_support)</Property>
+        <Property Id="ARPPRODUCTICON" Value="application.ico"/>
+        <Property Id='ARPNOMODIFY'>1</Property>
+        <Property Id='ARPNOREPAIR'>1</Property>
+                
+        <!-- directories -->
+        <Media Id="1" Cabinet="Product.cab" EmbedCab="yes" />
+        <Directory Id="TARGETDIR" Name="SourceDir">            
+            <Directory Id="$(var.ProgramFilesDir)">
+                <Directory Id="CompanyDir" Name="$(var.manufacturer)">
+                    <Directory Id="INSTALLDIR" Name="$(var.product_name)">
+                        <Directory Id="Drivers7" Name="Drivers7"/>
+                        <Directory Id="Drivers7_pdb" Name="Drivers7_pdb"/>
+                        <Directory Id="Drivers8" Name="Drivers8"/>
+                        <Directory Id="Drivers8_pdb" Name="Drivers8_pdb"/>
+                    </Directory>
+                </Directory>
+            </Directory>
+            <!--
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="$(var.product_menu)" />
+            </Directory>
+        -->
+            <Directory Id="CommonAppDataFolder">
+                <Directory Id="CommonAppDataFolder_CompanyDir" Name="$(var.manufacturer)">
+                    <Directory Id="CommonAppDataFolder_CompanyDir_Project" Name="$(var.product_name)">
+                        <Directory Id="CommonAppDataFolder_CompanyDir_Project_Version" Name="1.0">
+                        </Directory>                        
+                    </Directory>
+                </Directory>
+            </Directory>
+            <Directory Id="DesktopFolder" Name="Desktop" />
+        </Directory>
+
+        <!-- Features -->
+        <Feature 
+            Id='Complete' 
+            Title='Application Files' 
+            Description='All files.' 
+            Display='expand' 
+            AllowAdvertise='no' 
+            InstallDefault='local' 
+            Absent='disallow' 
+            Level='1' 
+            ConfigurableDirectory='INSTALLDIR'>
+        
+            <!-- executables -->
+            <ComponentRef Id="Diladele.ActiveDirectory.Service.exe"/>
+            <ComponentRef Id="Diladele.ActiveDirectory.Service.pdb"/>
+            <ComponentRef Id="Diladele.ActiveDirectory.Inspection.dll"/>
+            <ComponentRef Id="Diladele.ActiveDirectory.Inspection.pdb"/>
+            <ComponentRef Id="log4net.dll"/>
+                    
+            <!-- resources 
+            <ComponentRef Id="ApplicationShortcut" /> -->
+            <ComponentRef Id="MachineWideConfigurationInRegistry"/>
+        </Feature>
+        
+        <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+        <WixVariable Id="WixUIBannerBmp" Value="bannrbmp.bmp" />
+        <WixVariable Id="WixUIDialogBmp" Value="dlgbmp.bmp" />        
+        
+        <!-- <Icon Id="remove.ico" SourceFile="remove.ico"/> -->
+        <Icon Id="application.ico" SourceFile="application.ico"/>
+        <UI>
+            <UIRef Id="WixUI_FeatureTree" />            
+            <Error Id="1000">
+                <![CDATA[This product requires Microsoft Windows 7 or above.]]>
+            </Error>
+            <Error Id="1001">
+                <![CDATA[This installation package is not supported by this processor type. Contact your product vendor.]]>
+            </Error>
+            
+            <!-- disabled for now as we offer the product for free now 
+            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="UserRegistrationDlg">LicenseAccepted = "1"</Publish>
+            <Publish Dialog="UserRegistrationDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+            <Publish Dialog="UserRegistrationDlg" Control="Next" Event="NewDialog" Value="CustomizeDlg">1</Publish>
+            <Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="UserRegistrationDlg" Order="2">NOT Installed</Publish>            
+            -->
+        </UI>
+
+        <DirectoryRef Id="TARGETDIR">
+            <Component Id="MachineWideConfigurationInRegistry" Guid="{302A7A28-3A44-4B32-BE88-759DE72BE17F}" KeyPath="yes" Win64="$(var.Is64Bit)">
+                <RegistryKey Root="HKLM" Key="$(var.reg_path)">                    
+                    <RegistryKey Key="Daemon">
+                        <RegistryValue Name="ResponderText" Type="string" Value="[INSTALLDIR]blocked.html"/>
+                        <RegistryValue Name="ResponderTextAdult" Type="string" Value="[INSTALLDIR]blocked_adult.html"/>
+                        <RegistryValue Name="ResponderTextDomains" Type="string" Value="[INSTALLDIR]blocked_domains.html"/>                        
+                        <RegistryValue Name="ResponderImage" Type="string" Value="[INSTALLDIR]transparent.gif"/>
+                    </RegistryKey>
+                    <RegistryKey Key="GUI">
+                        <RegistryValue Name="MinimizeToSystemTray" Type="integer" Value="0"/>
+                    </RegistryKey>
+                </RegistryKey>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="INSTALLDIR">
+            
+            <Component Id="Diladele.ActiveDirectory.Service.exe" Guid="{12D66ACF-08DE-481B-BC34-869C7B63B001}" Win64="$(var.Is64Bit)">
+                <File Id='Diladele.ActiveDirectory.Service.exe' Name='Diladele.ActiveDirectory.Service.exe' Checksum='yes' KeyPath='yes' DiskId='1' Vital='yes' Source='$(var.OUTDIR)\Diladele.ActiveDirectory.Service.exe'/>
+                <ServiceInstall Id='wsadi' DisplayName='$(var.service_displayname)' Name='$(var.service_name)' ErrorControl='normal' Description='$(var.service_desc)' Start='auto' Type='ownProcess' Vital='yes' Interactive='no'>
+                    <util:PermissionEx ServiceStart='yes' User='NetworkService'/>                    
+                </ServiceInstall>
+                <ServiceControl Id='wsadi' Name='$(var.service_name)' Start='install' Stop='both' Remove='uninstall'/>                
+                <RegistryKey Root="HKLM" Key="$(var.reg_path)">
+                    <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]"/>
+                    <RegistryValue Type="string" Name="LicenseKey" Value="[PIDKEY]"/>
+                </RegistryKey>
+            </Component>
+
+            <Component Id="Diladele.ActiveDirectory.Service.pdb" Guid="{9339FEB1-B0EE-46A0-81B1-FB5C0D6F8888}" Win64="$(var.Is64Bit)">
+                <File Id='Diladele.ActiveDirectory.Service.pdb' Checksum='yes' KeyPath='yes' DiskId='1' Vital='yes' Source='$(var.OUTDIR)\Diladele.ActiveDirectory.Service.pdb'/>
+            </Component>
+            
+            <Component Id="Diladele.ActiveDirectory.Inspection.dll" Guid="{0BFDE8CD-05EA-4E1A-B1AC-4B2BE354464E}" Win64="$(var.Is64Bit)">
+                <File Id='Diladele.ActiveDirectory.Inspection.dll' Checksum='yes' KeyPath='yes' DiskId='1' Vital='yes' Source='$(var.OUTDIR)\Diladele.ActiveDirectory.Inspection.dll'/>
+            </Component>
+
+            <Component Id="Diladele.ActiveDirectory.Inspection.pdb" Guid="{3A172E00-5635-46EC-A2C1-83905FE600B4}" Win64="$(var.Is64Bit)">
+                <File Id='Diladele.ActiveDirectory.Inspection.pdb' Checksum='yes' KeyPath='yes' DiskId='1' Vital='yes' Source='$(var.OUTDIR)\Diladele.ActiveDirectory.Inspection.pdb'/>
+            </Component>
+
+            <Component Id="log4net.dll" Guid="{E0EC1BF5-92F0-4E11-BBB4-C6F40DC8F4FD}" Win64="$(var.Is64Bit)">
+                <File Id='log4net.dll' Checksum='yes' KeyPath='yes' DiskId='1' Vital='yes' Source='$(var.OUTDIR)\log4net.dll'/>
+            </Component>
+
+        </DirectoryRef>      
+        
+        <!--
+        <DirectoryRef Id="ApplicationProgramsFolder">
+            <Component Id="ApplicationShortcut" Guid="{E5356E6F-13FB-48C1-9795-4CDB0F082A77}" Win64="$(var.Is64Bit)">
+                <Shortcut Id="ApplicationStartMenuShortcut" Name="$(var.product_menu)" Description="$(var.product_desc)" Target="[INSTALLDIR]ddwsc.exe" WorkingDirectory="INSTALLDIR"/>
+                <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="$(var.reg_path)" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+    -->
+        
+        <InstallUISequence>
+            <?if $(var.Platform) = "x64"?>
+                <Custom Action="CA.HasSupportedOS" Sequence="1"><![CDATA[NOT Installed AND VersionNT64 < 501]]></Custom>
+            <?else?>
+                <Custom Action="CA.HasSupportedPlatform" Sequence="1"><![CDATA[NOT Installed AND Msix64]]></Custom>
+                <Custom Action="CA.HasSupportedOS" After="CA.HasSupportedPlatform"><![CDATA[NOT Installed AND VersionNT < 501]]></Custom>
+            <?endif?>
+        </InstallUISequence>
+        
+        <?if $(var.Platform) = "x86"?>
+        <CustomAction Id="CA.HasSupportedPlatform" Error="1001" Execute="firstSequence" />
+        <?endif?>
+        <CustomAction Id="CA.HasSupportedOS" Error="1000" Execute="firstSequence" />
+        <!--<CustomAction Id="CA.OpenFileDialog" BinaryKey="B.CustomAction" DllEntry="OpenFileDialog" />-->
+        <CustomAction Id="CA.SaveTargetDir" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" /> 
+        
+        <!-- 
+            the AachenDeferredPrepareProduct custom action is meant to change the system configuration
+            it has to run deferred; in order to pass information to this custom action we run another
+            custom action called AachenDeferredPrepareProduct.SetProperty, value of this property
+            is used to pass additional information to deferred custom action which is not usually
+            available
+            
+            see http://vadmyst.blogspot.com/2006/05/deferred-custom-actions-with-wix.html for more explanation
+        
+
+
+        <CustomAction Id="AachenDeferredPrepareProduct.SetProperty" Return="check" Property="AachenDeferredPrepareProduct" Value="[INSTALLDIR]"/>
+        <CustomAction Id="AachenDeferredPrepareProduct" BinaryKey="B.CustomAction" DllEntry="DeferredPrepareProduct" Execute="deferred" Impersonate="no"/>
+        <CustomAction Id='AachenDeferredUnPrepareProduct' BinaryKey="B.CustomAction" DllEntry="DeferredUnPrepareProduct" Execute="deferred" Impersonate="no"/>
+
+        -->
+
+        <!-- schedule custom actions 
+        <InstallExecuteSequence>
+            <Custom Action="AachenDeferredPrepareProduct.SetProperty" After="ValidateProductID"/>
+            <Custom Action='AachenDeferredUnPrepareProduct' After='DeleteServices'>Installed</Custom>
+            <Custom Action='AachenDeferredPrepareProduct' Before='StartServices'>NOT Installed</Custom>
+
+            <?if $(var.Platform) = "x64"?>
+                <Custom Action="CA.HasSupportedOS" Sequence="1"><![CDATA[NOT Installed AND VersionNT64 < 501]]></Custom>
+            <?else?>
+                <Custom Action="CA.HasSupportedPlatform" Sequence="1"><![CDATA[NOT Installed AND Msix64]]></Custom>
+                <Custom Action="CA.HasSupportedOS" After="CA.HasSupportedPlatform"><![CDATA[NOT Installed AND VersionNT < 501]]></Custom>
+            <?endif?>
+            <Custom Action="CA.SaveTargetDir" After="InstallValidate"></Custom>
+        </InstallExecuteSequence>
+
+        -->
+        
+        <!-- <Binary Id="B.CustomAction" SourceFile="$(var.OUTDIR)\custom_actions.dll" /> -->
+    </Product>
+</Wix>
+
