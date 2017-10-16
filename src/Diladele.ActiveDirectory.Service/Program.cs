@@ -16,7 +16,7 @@ namespace Diladele.ActiveDirectory.Service
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[] 
             { 
-                new Service1() 
+                new InspectorService() 
             };
             ServiceBase.Run(ServicesToRun);
         }
