@@ -59,6 +59,9 @@
     <Compile Include="ServiceInterop.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Diladele.ActiveDirectory.Service.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

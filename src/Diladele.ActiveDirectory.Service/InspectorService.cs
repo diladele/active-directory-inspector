@@ -81,8 +81,7 @@ namespace Diladele.ActiveDirectory.Service
         private Storage   _storage;
         private Harvester _harvester;
         private Listener  _listener;
-
-
+        
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
