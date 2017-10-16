@@ -1,13 +1,13 @@
 @echo off
 rem
-rem build_msi.bat debug|release <version as x.x.x.x> <git revision> <path like m:\aachen>
+rem build.bat <version as x.x.x.x> <git revision>
 rem
 
 rem
 rem configuration section
 rem
 set PLATFORM=x64
-set CONFIGURATION=%1
+set CONFIGURATION=debug
 set VERSION=0.0.0.1
 set REVISION=%4
 
@@ -23,13 +23,14 @@ del /F /S /Q %DIR_TMP%\ > nul
 mkdir %DIR_TMP% > nul
 
 :: copy all binaries
-copy %DIR_BIN%\Diladele.ActiveDirectory.Inspection.dll %DIR_TMP%\ > nul
-copy %DIR_BIN%\Diladele.ActiveDirectory.Inspection.pdb %DIR_TMP%\ > nul
-copy %DIR_BIN%\Diladele.ActiveDirectory.Server.dll     %DIR_TMP%\ > nul
-copy %DIR_BIN%\Diladele.ActiveDirectory.Server.pdb     %DIR_TMP%\ > nul
-copy %DIR_BIN%\Diladele.ActiveDirectory.Service.exe    %DIR_TMP%\ > nul
-copy %DIR_BIN%\Diladele.ActiveDirectory.Service.pdb    %DIR_TMP%\ > nul
-copy %DIR_BIN%\log4net.dll                             %DIR_TMP%\ > nul
+copy %DIR_BIN%\Diladele.ActiveDirectory.Inspection.dll     %DIR_TMP%\ > nul
+copy %DIR_BIN%\Diladele.ActiveDirectory.Inspection.pdb     %DIR_TMP%\ > nul
+copy %DIR_BIN%\Diladele.ActiveDirectory.Server.dll         %DIR_TMP%\ > nul
+copy %DIR_BIN%\Diladele.ActiveDirectory.Server.pdb         %DIR_TMP%\ > nul
+copy %DIR_BIN%\Diladele.ActiveDirectory.Service.exe        %DIR_TMP%\ > nul
+copy %DIR_BIN%\Diladele.ActiveDirectory.Service.pdb        %DIR_TMP%\ > nul
+copy %DIR_BIN%\Diladele.ActiveDirectory.Service.exe.config %DIR_TMP%\ > nul
+copy %DIR_BIN%\log4net.dll                                 %DIR_TMP%\ > nul
 
 ::copy %BINDIR%\ddwsupd.* %DIR_TMP%\ > nul
 ::copy %BINDIR%\ddwsc.* %DIR_TMP%\ > nul
