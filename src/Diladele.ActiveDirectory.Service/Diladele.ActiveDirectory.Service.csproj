@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
-      <HintPath>..\packages\log4net.2.0.8\lib\net40-full\log4net.dll</HintPath>
+      <HintPath>..\..\packages\log4net.2.0.8\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -65,6 +65,10 @@
     <ProjectReference Include="..\Diladele.ActiveDirectory.Inspection\Diladele.ActiveDirectory.Inspection.csproj">
       <Project>{78720f9a-b362-4211-8145-e1e9c8cc9a54}</Project>
       <Name>Diladele.ActiveDirectory.Inspection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Diladele.ActiveDirectory.Server\Diladele.ActiveDirectory.Server.csproj">
+      <Project>{dc2d8dba-1c55-4bc7-9f95-b576a959f1fc}</Project>
+      <Name>Diladele.ActiveDirectory.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
