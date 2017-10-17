@@ -15,7 +15,7 @@ namespace Diladele.ActiveDirectory.Inspection
     public interface IStorage
     {
         void Insert(Address a);
-        bool Find(string ip, out string user);
+        bool LookUp(string ip, out Address a);
         bool Dump(out List<Address> addresses);
     }
 
@@ -55,9 +55,28 @@ namespace Diladele.ActiveDirectory.Inspection
             }
         }
 
-        public bool Find(string ip, out string user)
+        public bool LookUp(string ip, out Address address)
         {
-            throw new NotImplementedException();
+            // assume not found
+            address = null;
+
+            // parse the ip to look for
+            IPAddress value = null;
+            {
+                if(!IPAddress.TryParse(ip, out value))
+                    return false;
+            }
+
+            lock (_guard)
+            {
+                Address found = _addresses.Find(item => item.IP.Equals(value));
+                if (found == null)
+                    return false;
+
+                address = found.Clone();
+            }
+
+            return true;
         }
 
         public bool Dump(out List<Address> addresses)
@@ -86,6 +105,6 @@ namespace Diladele.ActiveDirectory.Inspection
         }
 
         private System.Object _guard;
-        private List<Address> _addresses;
+        public List<Address> _addresses; // it is public to be serialized :(
     }
 }

@@ -7,7 +7,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
-using System.Runtime.InteropServices;  
+using System.Runtime.InteropServices;
+using Diladele.ActiveDirectory.Server;  
 
 namespace Diladele.ActiveDirectory.Service
 {
@@ -30,8 +31,11 @@ namespace Diladele.ActiveDirectory.Service
                 // start harvester
                 _harvester = new Harvester(_storage);
 
-                // and start listener
+                // start listener
                 _listener = new Listener(_storage);
+
+                // start web server
+                _webserver = new WebServer(_storage);
             }
             catch(Exception e)            
             {
@@ -59,6 +63,9 @@ namespace Diladele.ActiveDirectory.Service
 
             try
             {
+                // stop web server
+                _webserver.Dispose();
+
                 // stop harvester
                 _harvester.Dispose();
 
@@ -66,6 +73,7 @@ namespace Diladele.ActiveDirectory.Service
                 StorageFactory.SaveToDisk(_storage);
 
                 // and reset all
+                _webserver = null;
                 _harvester = null;
                 _listener  = null;
                 _storage   = null;
@@ -78,6 +86,7 @@ namespace Diladele.ActiveDirectory.Service
             log.Info("Service stopped successfully.");
         }
 
+        private WebServer _webserver;
         private Storage   _storage;
         private Harvester _harvester;
         private Listener  _listener;

@@ -47,29 +47,41 @@ namespace Diladele.ActiveDirectory.Inspection
             string cur_path = GetDiskPath();
             string new_path = cur_path + ".tmp";
 
-            log.InfoFormat("Storage is being saved to file {1}", cur_path);
+            log.InfoFormat("Storage is being saved to file {0}", cur_path);
 
-            // remove old file
-            if (File.Exists(new_path))
+            try
             {
-                File.Delete(new_path);
-            }
+                // remove old file
+                if (File.Exists(new_path))
+                {
+                    File.Delete(new_path);
+                }
 
-            // recreate folder if it does not exist
-            if(!Directory.Exists(Path.GetDirectoryName(new_path)))
+                // recreate folder if it does not exist
+                if (!Directory.Exists(Path.GetDirectoryName(new_path)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(new_path));
+                }
+
+                // write the xml serialized storage
+                XmlSerializer ser = new XmlSerializer(typeof(Storage));
+
+                using (StreamWriter writer = new StreamWriter(new_path))
+                {
+                    ser.Serialize(writer, storage);
+                }
+
+                // good now move the new file into the old one
+                if (File.Exists(cur_path))
+                    File.Delete(cur_path);
+                File.Move(new_path, cur_path);
+
+                log.InfoFormat("Storage successfully saved to file {0}", cur_path);
+            }
+            catch (Exception e)
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(new_path));
+                log.ErrorFormat("Error while saving storage to file {0}. Error: {1}", cur_path, e.Message);
             }
-
-            // write the xml serialized storage
-            File.WriteAllText(new_path, storage.ToXmlString());
-
-            // good now move the new file into the old one
-            if (File.Exists(cur_path))
-                File.Delete(cur_path);
-            File.Move(new_path, cur_path);
-
-            log.InfoFormat("Storage successfully saved to file {0}", cur_path);
         }
 
         private static string GetDiskPath()

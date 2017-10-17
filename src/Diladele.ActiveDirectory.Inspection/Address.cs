@@ -74,5 +74,24 @@ namespace Diladele.ActiveDirectory.Inspection
                 return string.Format("IP {0}, User Count: {1}, Users:{2}", this.IP.ToString(), this.Users.Count, users);
             }
         }
+
+        public string AsJson
+        {
+            get
+            {
+                string json_ip    = string.Format("\"IP\": \"{0}\"", this.SerializedIP);
+                
+                List<string> tmp = new List<string>();
+                foreach (var user in this.Users)
+                {
+                    string json_user = string.Format("\"name\": \"{0}\", \"domain\": \"{1}\"", user.Domain, user.Name);
+                    tmp.Add("{" + json_user + "}");
+                }
+
+                var result = string.Join(", ", tmp.ToArray());
+
+                return "{" + json_ip + ", \"users\": [ " + result + "] }";
+            }
+        }
     }
 }
