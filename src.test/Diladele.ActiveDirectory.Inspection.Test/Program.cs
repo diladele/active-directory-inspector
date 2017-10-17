@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Diladele.ActiveDirectory.Server;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -23,14 +24,24 @@ namespace Diladele.ActiveDirectory.Inspection.Test
 
         static void Main(string[] args)
         {
-            Trace.Listeners.Add(new TextWriterTraceListener(GetDiskPath()));
-            Trace.AutoFlush = true;
-
-            TestHarvester();
+            TestWebServer();
+            //TestHarvester();
             //TestListener();
 
             //TestInspector();            
             //TestProber();
+        }
+
+        static void TestWebServer()
+        {
+            // load storage from disk
+            var storage = StorageFactory.LoadFromDisk();
+
+            // and give it to web server
+            using (var webserver = new WebServer(storage))
+            {
+                Thread.Sleep(100 * 1000);
+            }
         }
 
 
@@ -39,12 +50,15 @@ namespace Diladele.ActiveDirectory.Inspection.Test
             // load storage from disk
             var storage = StorageFactory.LoadFromDisk();
 
-            // create listener
+            // create harvester
             using(var harvester = new Harvester(storage))
             {
-                // wait 100 seconds
-                Thread.Sleep(100 * 1000);
+                // wait 60 seconds
+                Thread.Sleep(60 * 1000);
             }
+
+            // and save the storage
+            StorageFactory.SaveToDisk(storage);
         }
 
         static void TestInspector()

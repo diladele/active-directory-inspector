@@ -49,6 +49,10 @@
       <Project>{78720f9a-b362-4211-8145-e1e9c8cc9a54}</Project>
       <Name>Diladele.ActiveDirectory.Inspection</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Diladele.ActiveDirectory.Server\Diladele.ActiveDirectory.Server.csproj">
+      <Project>{dc2d8dba-1c55-4bc7-9f95-b576a959f1fc}</Project>
+      <Name>Diladele.ActiveDirectory.Server</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
