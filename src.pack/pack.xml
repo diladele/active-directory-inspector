@@ -1,0 +1,26 @@
+<Project  xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+<!--
+    msbuild.exe pack.xml /t:[build|clean|rebuild] /p:Configuration=[debug|release]
+-->
+    <PropertyGroup>
+        <CandleExe>c:\Program Files (x86)\WiX Toolset v3.9\bin\candle.exe</CandleExe>
+        <LightExe>c:\Program Files (x86)\WiX Toolset v3.9\bin\light.exe</LightExe>
+        <MsiName>active-directory-inspector.msi</MsiName>        
+    </PropertyGroup>
+        
+    <!-- Targets -->
+    <Target Name="Clean" >
+        <Delete Files="$(OutDir)\$(MsiName)"/>
+    </Target>
+    <Target Name="CheckProperties">
+        <Error Condition="'$(Configuration)'==''" Text="/p:Configuration= argument is invalid. Possible values are debug|release"/>
+        <Error Condition="'$(Version)'==''" Text="/p:Version= argument is invalid. Possible value looks like 1.0.0.0"/>
+        <Error Condition="'$(OutDir)'==''" Text="/p:OutDir= argument is invalid. OutDir is a path to the directory with files"/>
+    </Target>
+    <Target Name="Build" DependsOnTargets="CheckProperties">
+        <Exec Command='"$(CandleExe)" /nologo /pedantic /ext WiXNetFxExtension /ext WiXUtilExtension /ext WixUIExtension /dOUTDIR=$(OutDir) /dBUILDTYPE=$(Configuration) /dVERSION=$(Version) /out $(OutDir)/pack.wixobj pack.wxs'/>
+        <Exec Command='"$(LightExe)" /pedantic /nologo /ext WiXNetFxExtension /ext WiXUtilExtension /ext WixUIExtension /ext WixSqlExtension /sval /out "$(OutDir)\$(MsiName)" $(OutDir)\*.wixobj'/>        
+    </Target>
+    <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+</Project>
+

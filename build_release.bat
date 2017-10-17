@@ -12,10 +12,10 @@ call env.bat
 pushd tools\builder
 
 :: build the project one by one
-%MSBUILD% build.xml    /p:Configuration=Release
-%MSBUILD% sign.xml     /p:Configuration=Release
-:: %MSBUILD% pack.xml     /p:Configuration=Release
-:: %MSBUILD% sign_msi.xml /p:Configuration=Release
+%MSBUILD% build.xml /p:Configuration=Release
+%MSBUILD% sign.xml  /p:Configuration=Release
+%MSBUILD% pack.xml  /p:Configuration=Release
+%MSBUILD% msi.xml   /p:Configuration=Release
 
 :: get back
 popd
