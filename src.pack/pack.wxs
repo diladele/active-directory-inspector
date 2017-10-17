@@ -86,6 +86,8 @@
             <ComponentRef Id="Diladele.ActiveDirectory.Service.exe.config"/>
             <ComponentRef Id="Diladele.ActiveDirectory.Inspection.dll"/>
             <ComponentRef Id="Diladele.ActiveDirectory.Inspection.pdb"/>
+            <ComponentRef Id="Diladele.ActiveDirectory.Server.dll"/>
+            <ComponentRef Id="Diladele.ActiveDirectory.Server.pdb"/>
             <ComponentRef Id="log4net.dll"/>
             <ComponentRef Id="MachineWideConfigurationInRegistry"/>
         </Feature>
@@ -151,6 +153,14 @@
 
             <Component Id="Diladele.ActiveDirectory.Inspection.pdb" Guid="{3A172E00-5635-46EC-A2C1-83905FE600B4}" Win64="yes">
                 <File Id='Diladele.ActiveDirectory.Inspection.pdb' Checksum='yes' KeyPath='yes' DiskId='1' Vital='yes' Source='$(var.OUTDIR)\Diladele.ActiveDirectory.Inspection.pdb'/>
+            </Component>
+
+            <Component Id="Diladele.ActiveDirectory.Server.dll" Guid="{D92BD129-5803-4DDE-8E70-4764A31338DB}" Win64="yes">
+                <File Id='Diladele.ActiveDirectory.Server.dll' Checksum='yes' KeyPath='yes' DiskId='1' Vital='yes' Source='$(var.OUTDIR)\Diladele.ActiveDirectory.Server.dll'/>
+            </Component>
+
+            <Component Id="Diladele.ActiveDirectory.Server.pdb" Guid="{86938940-CA76-4478-A1AD-0B0509BADE42}" Win64="yes">
+                <File Id='Diladele.ActiveDirectory.Server.pdb' Checksum='yes' KeyPath='yes' DiskId='1' Vital='yes' Source='$(var.OUTDIR)\Diladele.ActiveDirectory.Server.pdb'/>
             </Component>
 
             <Component Id="log4net.dll" Guid="{E0EC1BF5-92F0-4E11-BBB4-C6F40DC8F4FD}" Win64="yes">
