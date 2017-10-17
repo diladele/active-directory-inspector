@@ -1,4 +1,7 @@
 *.suo
+*.pfx
 bin/
 obj/
 ztmp/
+
+env.bat
