@@ -1,0 +1,15 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+
+    	<RootDir>$(MSBuildProjectDirectory)\..\..</RootDir>
+
+        <Major>1</Major>
+        <Minor>0</Minor>
+        <HotFix>0</HotFix>
+        <Revision>0</Revision>
+        
+        <SignToolExe>c:\Program Files (x86)\Windows Kits\8.1\bin\x64\signtool.exe</SignToolExe>
+    </PropertyGroup>    
+</Project>
+

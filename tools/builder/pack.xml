@@ -1,0 +1,12 @@
+<Project  xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+
+    <Import Project="shared.xml"/>
+    <Target Name="Pack">   
+        <MsBuild 
+            Projects="$(RootDir)\src.pack\pack.xml" 
+            Properties="Configuration=$(Configuration);Version=$(Major).$(Minor).$(HotFix).$(Revision);OutDir=$(RootDir)\bin\$(Configuration)"
+        />
+    </Target>
+    <Target Name="Build" DependsOnTargets="Pack;"/>
+</Project>
+
