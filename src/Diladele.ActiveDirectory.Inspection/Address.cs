@@ -84,7 +84,7 @@ namespace Diladele.ActiveDirectory.Inspection
                 List<string> tmp = new List<string>();
                 foreach (var user in this.Users)
                 {
-                    string json_user = string.Format("\"name\": \"{0}\", \"domain\": \"{1}\"", user.Domain, user.Name);
+                    string json_user = string.Format("\"name\": \"{0}\", \"domain\": \"{1}\", \"sid\": \"{2}\", \"principal\": \"{3}\" ", user.Name, user.Domain, user.Sid, user.PrincipalName);
                     tmp.Add("{" + json_user + "}");
                 }
 
