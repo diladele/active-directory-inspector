@@ -8,7 +8,8 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Runtime.InteropServices;
-using Diladele.ActiveDirectory.Server;  
+using Diladele.ActiveDirectory.Server;
+using Diladele.ActiveDirectory.Config;  
 
 namespace Diladele.ActiveDirectory.Service
 {
@@ -25,6 +26,9 @@ namespace Diladele.ActiveDirectory.Service
 
             try
             {
+                // load config
+                var config = ConfigFactory.Instance();
+
                 // load storage
                 _storage = StorageFactory.LoadFromDisk();
 
@@ -35,7 +39,7 @@ namespace Diladele.ActiveDirectory.Service
                 _listener = new Listener(_storage);
 
                 // start web server
-                _webserver = new WebServer(_storage);
+                _webserver = new WebServer(config, _storage);
             }
             catch(Exception e)            
             {

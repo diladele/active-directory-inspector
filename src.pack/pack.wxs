@@ -113,6 +113,9 @@
         <DirectoryRef Id="TARGETDIR">
             <Component Id="MachineWideConfigurationInRegistry" Guid="{302A7A28-3A44-4B32-BE88-759DE72BE17F}" KeyPath="yes" Win64="yes">
                 <RegistryKey Root="HKLM" Key="$(var.reg_path)">                    
+                    <RegistryKey Key="Server">
+                        <RegistryValue Name="ListenPort" Type="string" Value="8000"/>
+                    </RegistryKey>
                     <RegistryKey Key="Daemon">
                         <RegistryValue Name="ResponderText" Type="string" Value="[INSTALLDIR]blocked.html"/>
                         <RegistryValue Name="ResponderTextAdult" Type="string" Value="[INSTALLDIR]blocked_adult.html"/>

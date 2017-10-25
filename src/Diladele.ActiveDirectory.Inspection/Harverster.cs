@@ -95,8 +95,11 @@ namespace Diladele.ActiveDirectory.Inspection
             {
                 log.DebugFormat("Resolving workstation {0}", workstation.DnsHostName);
 
+                // get host entry (this clears DNS cache in .net too)
+                var hostenry = Dns.GetHostEntry(workstation.DnsHostName);
+
                 // get addresses
-                var addresses = Dns.GetHostAddresses(workstation.DnsHostName);
+                var addresses = hostenry.AddressList;
                 {
                     log.DebugFormat("Workstation {0} was resolved into {1} IP addresses", workstation.DnsHostName, addresses.Length);
 
