@@ -45,6 +45,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Diladele.ActiveDirectory.Config\Diladele.ActiveDirectory.Config.csproj">
+      <Project>{5e4e5981-e3c6-46a5-ab57-20768d3dad5a}</Project>
+      <Name>Diladele.ActiveDirectory.Config</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Diladele.ActiveDirectory.Inspection\Diladele.ActiveDirectory.Inspection.csproj">
       <Project>{78720f9a-b362-4211-8145-e1e9c8cc9a54}</Project>
       <Name>Diladele.ActiveDirectory.Inspection</Name>

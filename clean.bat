@@ -3,6 +3,8 @@ rmdir /S /Q .\bin
 rmdir /S /Q .\ztmp
 
 :: remove all output of .net projects
+rmdir /S /Q .\src\Diladele.ActiveDirectory.Config\bin
+rmdir /S /Q .\src\Diladele.ActiveDirectory.Config\obj
 rmdir /S /Q .\src\Diladele.ActiveDirectory.Inspection\bin
 rmdir /S /Q .\src\Diladele.ActiveDirectory.Inspection\obj
 rmdir /S /Q .\src\Diladele.ActiveDirectory.Server\bin

@@ -3,6 +3,7 @@
     <Import Project="shared.xml"/>
     
     <Target Name="Compile">
+        <MSBuild Projects="$(RootDir)\src\Diladele.ActiveDirectory.Config\Diladele.ActiveDirectory.Config.csproj" Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
     	<MSBuild Projects="$(RootDir)\src\Diladele.ActiveDirectory.Inspection\Diladele.ActiveDirectory.Inspection.csproj" Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
         <MSBuild Projects="$(RootDir)\src\Diladele.ActiveDirectory.Server\Diladele.ActiveDirectory.Server.csproj" Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
         <MSBuild Projects="$(RootDir)\src\Diladele.ActiveDirectory.Service\Diladele.ActiveDirectory.Service.csproj" Properties="Configuration=$(Configuration);Platform=AnyCPU"/>        

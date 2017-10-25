@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DC2D8DBA-1C55-4BC7-9F95-B576A959F1FC}</ProjectGuid>
+    <ProjectGuid>{5E4E5981-E3C6-46A5-AB57-20768D3DAD5A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Diladele.ActiveDirectory.Server</RootNamespace>
-    <AssemblyName>Diladele.ActiveDirectory.Server</AssemblyName>
+    <RootNamespace>Diladele.ActiveDirectory.Config</RootNamespace>
+    <AssemblyName>Diladele.ActiveDirectory.Config</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,18 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="WebServer.cs" />
+    <Compile Include="Class1.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="ConfigFactory.cs" />
+    <Compile Include="IConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Diladele.ActiveDirectory.Config\Diladele.ActiveDirectory.Config.csproj">
-      <Project>{5e4e5981-e3c6-46a5-ab57-20768d3dad5a}</Project>
-      <Name>Diladele.ActiveDirectory.Config</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Diladele.ActiveDirectory.Inspection\Diladele.ActiveDirectory.Inspection.csproj">
-      <Project>{78720f9a-b362-4211-8145-e1e9c8cc9a54}</Project>
-      <Name>Diladele.ActiveDirectory.Inspection</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

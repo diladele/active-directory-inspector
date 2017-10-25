@@ -3,7 +3,7 @@
     <Import Project="shared.xml"/>  
 
     <ItemGroup>
-        <FilesToSign Include="Diladele.ActiveDirectory.Inspection.dll Diladele.ActiveDirectory.Server.dll Diladele.ActiveDirectory.Service.exe log4net.dll"/>
+        <FilesToSign Include="Diladele.ActiveDirectory.Config.dll Diladele.ActiveDirectory.Inspection.dll Diladele.ActiveDirectory.Server.dll Diladele.ActiveDirectory.Service.exe log4net.dll"/>
     </ItemGroup>
     <Target Name="SignBinaries">
         <Exec 

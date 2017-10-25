@@ -1,4 +1,5 @@
 ﻿using Diladele.ActiveDirectory.Inspection;
+using Diladele.ActiveDirectory.Config;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +13,7 @@ namespace Diladele.ActiveDirectory.Server
 {
     public class WebServer : IDisposable
     {
-        public WebServer(IStorage storage)
+        public WebServer(IConfig config, IStorage storage)
         {
             // save the storage
             _storage = storage;
@@ -20,7 +21,7 @@ namespace Diladele.ActiveDirectory.Server
             // create new listener
             _listener = new HttpListener();
             {
-                _listener.Prefixes.Add("http://*:8000/");
+                _listener.Prefixes.Add(string.Format("http://*:{0}/", config.ListenPort));
             }
             
             // start it

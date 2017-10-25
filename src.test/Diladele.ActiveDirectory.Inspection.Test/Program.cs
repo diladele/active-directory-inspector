@@ -1,4 +1,5 @@
-﻿using Diladele.ActiveDirectory.Server;
+﻿using Diladele.ActiveDirectory.Config;
+using Diladele.ActiveDirectory.Server;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,8 +27,8 @@ namespace Diladele.ActiveDirectory.Inspection.Test
         static void Main(string[] args)
         {
             //TestRegex();
-            //TestWebServer();
-            TestHarvester();
+            TestWebServer();
+            //TestHarvester();
             //TestListener();
 
             //TestInspector();            
@@ -47,11 +48,14 @@ namespace Diladele.ActiveDirectory.Inspection.Test
 
         static void TestWebServer()
         {
+            // load config
+            var config = ConfigFactory.Instance();
+
             // load storage from disk
             var storage = StorageFactory.LoadFromDisk();
 
             // and give it to web server
-            using (var webserver = new WebServer(storage))
+            using (var webserver = new WebServer(config, storage))
             {
                 Thread.Sleep(100 * 1000);
             }
