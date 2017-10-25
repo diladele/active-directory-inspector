@@ -29,7 +29,7 @@ namespace Diladele.ActiveDirectory.Inspection
         public static List<Workstation> Harvest()
         {
             // trace it
-            Trace.TraceInformation("Harvester - harvesting LDAP directory....");
+            log.Debug("Starting LDAP search for existing workstations in the Active Directory...");
 
             // this is the value to return
             List<Workstation> result = new List<Workstation>();
@@ -63,6 +63,8 @@ namespace Diladele.ActiveDirectory.Inspection
 
                             if (entry.Properties["name"].Count > 0)
                                 w.Name = (string)entry.Properties["name"][0];
+
+                            log.DebugFormat("Found workstation {0}", w.DnsHostName);
                         }
                         result.Add(w);
                     }
@@ -70,11 +72,13 @@ namespace Diladele.ActiveDirectory.Inspection
             }
 
             // trace it
-            Trace.TraceInformation("Harvester - harvest finished, got {0} workstations.", result.Count);
+            log.DebugFormat("LDAP search for workstations finished, got {0} workstations.", result.Count);
 
             // and return
             return result;
         }
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
     }
 
     //
@@ -89,13 +93,28 @@ namespace Diladele.ActiveDirectory.Inspection
 
             try
             {
-                // resolve the workstation name, get all addresses from it
-                foreach (IPAddress ip in Dns.GetHostAddresses(workstation.DnsHostName))
+                log.DebugFormat("Resolving workstation {0}", workstation.DnsHostName);
+
+                // get addresses
+                var addresses = Dns.GetHostAddresses(workstation.DnsHostName);
                 {
-                    Address address = Prober.Probe(ip);
-                    
+                    log.DebugFormat("Workstation {0} was resolved into {1} IP addresses", workstation.DnsHostName, addresses.Length);
+
+                    foreach (IPAddress ip in addresses)
+                    {
+                        log.DebugFormat("Workstation {0} has address {1}", workstation.DnsHostName, ip.ToString());
+                    }
+                }
+
+                // resolve the workstation name, get all addresses from it
+                foreach (IPAddress ip in addresses)
+                {
+                    Address address = Prober.Probe(ip);                    
                     if (address.Users.Count == 0)
                     {
+                        // log it
+                        log.DebugFormat("Probing of address {0} for workstation {1} indicated the number of logged in users are 0, skipping it.", ip.ToString(), workstation.DnsHostName);
+
                         // there are no one logged on on that IP, skip it then
                         continue; ;
                     }
@@ -111,18 +130,23 @@ namespace Diladele.ActiveDirectory.Inspection
                     address.LastLogon         = workstation.LastLogon;
                     address.Name              = workstation.Name;
 
+                    // log it
+                    log.DebugFormat("Address {0} was probed successfully, {1} users found. Adding it to the storage.", ip.ToString(), address.Users.Count);
+
                     // and add this address
                     result.Add(address);
                 }
             }
             catch (Exception e)
             {
-                Trace.TraceInformation("WorkstationProber - probe failed for workstation {0}. Error: {1}", workstation.DnsHostName, e.Message);
+                log.WarnFormat("Probe failed for workstation {0}. Error: {1}", workstation.DnsHostName, e.Message);
             }
 
             // and return (possibly empty) list
             return result;
         }
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
     }
 
@@ -209,6 +233,10 @@ namespace Diladele.ActiveDirectory.Inspection
                 // dump end
                 log.Debug("LDAP harvester timer completed.");
             }
+            catch(Exception e)
+            {
+                log.WarnFormat("Ignoring LDAP harvester error: {0}", e.ToString());
+            }
             finally
             {
                 // reset the active flag
@@ -257,8 +285,12 @@ namespace Diladele.ActiveDirectory.Inspection
             }
             else
             {
+                log.DebugFormat("No workstations to probe remaining, getting the list of existing workstations from LDAP server...");
+
                 // we do not have any workstations left, issue a call to LDAP server
                 List<Workstation> workstations = WorkstationHarvester.Harvest();
+
+                log.DebugFormat("Got {0} workstations from LDAP server, adding them all to probe queue.", workstations.Count);
 
                 // and update the list in class
                 lock (_guard)

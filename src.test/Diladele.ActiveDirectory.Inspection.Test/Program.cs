@@ -26,8 +26,8 @@ namespace Diladele.ActiveDirectory.Inspection.Test
         static void Main(string[] args)
         {
             //TestRegex();
-            TestWebServer();
-            //TestHarvester();
+            //TestWebServer();
+            TestHarvester();
             //TestListener();
 
             //TestInspector();            

@@ -15,6 +15,8 @@ namespace Diladele.ActiveDirectory.Inspection
     {
         public static Address Probe(IPAddress address)
         {
+            log.DebugFormat("Probing address {0}", address.ToString());
+
             // this is the list of users found on that ip address
             Address result = new Address();
             {
@@ -24,6 +26,8 @@ namespace Diladele.ActiveDirectory.Inspection
             // issue WMI request to the remote IP
             ManagementScope scope = new ManagementScope(@"\\" + address.ToString() + @"\root\cimv2");
             ObjectQuery     query = new ObjectQuery("select * from win32_process");
+
+            log.DebugFormat("Creating management searcher with scope {0}, query {1}", scope.Path, query.QueryString);
 
             using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(scope, query))
             {
@@ -35,11 +39,18 @@ namespace Diladele.ActiveDirectory.Inspection
 
                     User user = Prober.ConstructUser(mo);
                     {
+                        // for debug
                         user.DebugProbedIpAddress = address.ToString();
+
+                        // log it
+                        log.DebugFormat("Found user {0}\\{1} in process {2}", user.Domain, user.Name, user.DebugProbedProcessPath);
                     }
                     result.Users.Add(user);
                 }
             }
+
+            // log it again
+            log.DebugFormat("Address {0} probed successfully, found {1} users.", address.ToString(), result.Users.Count);
 
             // and return nicely
             return result;
@@ -78,5 +89,7 @@ namespace Diladele.ActiveDirectory.Inspection
             // and return nicely
             return user;
         }
+
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
