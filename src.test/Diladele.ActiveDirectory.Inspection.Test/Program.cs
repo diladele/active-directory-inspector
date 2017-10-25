@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace Diladele.ActiveDirectory.Inspection.Test
@@ -24,12 +25,24 @@ namespace Diladele.ActiveDirectory.Inspection.Test
 
         static void Main(string[] args)
         {
+            //TestRegex();
             TestWebServer();
             //TestHarvester();
             //TestListener();
 
             //TestInspector();            
             //TestProber();
+        }
+
+        static void TestRegex()
+        {
+            string url  = "http://192.168.1.103:8000/ip/lookup/192.168.1.1";
+            Match match = Regex.Match(url, "/ip/lookup/(.*)/?", RegexOptions.IgnoreCase);
+            if (!match.Success)
+                throw new Exception("Invalid URL in HandleIpLookUp");
+
+            // copy out the ip address
+            string ip_addr = match.Groups[1].Value;
         }
 
         static void TestWebServer()
