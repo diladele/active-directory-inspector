@@ -1,0 +1,26 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+
+    <Import Project="shared.xml"/>
+    
+    <Target Name="Compile">
+        <MSBuild Projects="$(RootDir)\src\Diladele.ActiveDirectory.Config\Diladele.ActiveDirectory.Config.csproj" Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
+    	<MSBuild Projects="$(RootDir)\src\Diladele.ActiveDirectory.Inspection\Diladele.ActiveDirectory.Inspection.csproj" Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
+        <MSBuild Projects="$(RootDir)\src\Diladele.ActiveDirectory.Server\Diladele.ActiveDirectory.Server.csproj" Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
+        <MSBuild Projects="$(RootDir)\src\Diladele.ActiveDirectory.Service\Diladele.ActiveDirectory.Service.csproj" Properties="Configuration=$(Configuration);Platform=AnyCPU"/>        
+    </Target>
+    <Target Name="Publish">
+    	<ItemGroup>
+            <SourceFiles Include="
+                $(RootDir)\src\Diladele.ActiveDirectory.Service\bin\$(Configuration)\*.exe;
+                $(RootDir)\src\Diladele.ActiveDirectory.Service\bin\$(Configuration)\*.exe.config;
+                $(RootDir)\src\Diladele.ActiveDirectory.Service\bin\$(Configuration)\*.pdb;
+                $(RootDir)\src\Diladele.ActiveDirectory.Service\bin\$(Configuration)\*.dll;
+            "/> 
+        </ItemGroup>        
+        <Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(RootDir)\bin\$(Configuration)"/>
+    </Target>
+    <Target Name="Build" DependsOnTargets="Compile;Publish"/>
+    <Target Name="Clean"/>
+    <Target Name="Rebuild" DependsOnTargets="Clean;Build"/>
+</Project>
+

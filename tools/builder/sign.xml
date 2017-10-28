@@ -1,0 +1,15 @@
+<Project  xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+
+    <Import Project="shared.xml"/>  
+
+    <ItemGroup>
+        <FilesToSign Include="Diladele.ActiveDirectory.Config.dll Diladele.ActiveDirectory.Inspection.dll Diladele.ActiveDirectory.Server.dll Diladele.ActiveDirectory.Service.exe log4net.dll"/>
+    </ItemGroup>
+    <Target Name="SignBinaries">
+        <Exec 
+            Command='"$(SignToolExe)" sign /ph /v /f $(SIGN_PFX) /p $(SIGN_PWD) /d "Active Directory Inspector" /t "http://timestamp.verisign.com/scripts/timestamp.dll" @(FilesToSign)'
+            WorkingDirectory="$(RootDir)\bin\$(Configuration)" />
+    </Target>            
+    <Target Name="Build" DependsOnTargets="SignBinaries"/>
+</Project>
+

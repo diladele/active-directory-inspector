@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diladele.ActiveDirectory.Inspection", "src\Diladele.ActiveDirectory.Inspection\Diladele.ActiveDirectory.Inspection.csproj", "{78720F9A-B362-4211-8145-E1E9C8CC9A54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diladele.ActiveDirectory.Server", "src\Diladele.ActiveDirectory.Server\Diladele.ActiveDirectory.Server.csproj", "{DC2D8DBA-1C55-4BC7-9F95-B576A959F1FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diladele.ActiveDirectory.Service", "src\Diladele.ActiveDirectory.Service\Diladele.ActiveDirectory.Service.csproj", "{3CB3F0DF-706C-4883-ADBF-FC06A342699F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diladele.ActiveDirectory.Inspection.Test", "src.test\Diladele.ActiveDirectory.Inspection.Test\Diladele.ActiveDirectory.Inspection.Test.csproj", "{FD205382-778D-4659-9A04-35072222F3F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diladele.ActiveDirectory.Inspection.UI", "src.test\Diladele.ActiveDirectory.Inspection.UI\Diladele.ActiveDirectory.Inspection.UI.csproj", "{F62E1B73-4607-4B2F-A71B-A61F5772CAD7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diladele.ActiveDirectory.Config", "src\Diladele.ActiveDirectory.Config\Diladele.ActiveDirectory.Config.csproj", "{5E4E5981-E3C6-46A5-AB57-20768D3DAD5A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{78720F9A-B362-4211-8145-E1E9C8CC9A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78720F9A-B362-4211-8145-E1E9C8CC9A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78720F9A-B362-4211-8145-E1E9C8CC9A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78720F9A-B362-4211-8145-E1E9C8CC9A54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC2D8DBA-1C55-4BC7-9F95-B576A959F1FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC2D8DBA-1C55-4BC7-9F95-B576A959F1FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC2D8DBA-1C55-4BC7-9F95-B576A959F1FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC2D8DBA-1C55-4BC7-9F95-B576A959F1FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CB3F0DF-706C-4883-ADBF-FC06A342699F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CB3F0DF-706C-4883-ADBF-FC06A342699F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CB3F0DF-706C-4883-ADBF-FC06A342699F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CB3F0DF-706C-4883-ADBF-FC06A342699F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD205382-778D-4659-9A04-35072222F3F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD205382-778D-4659-9A04-35072222F3F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD205382-778D-4659-9A04-35072222F3F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD205382-778D-4659-9A04-35072222F3F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F62E1B73-4607-4B2F-A71B-A61F5772CAD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F62E1B73-4607-4B2F-A71B-A61F5772CAD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F62E1B73-4607-4B2F-A71B-A61F5772CAD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F62E1B73-4607-4B2F-A71B-A61F5772CAD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E4E5981-E3C6-46A5-AB57-20768D3DAD5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E4E5981-E3C6-46A5-AB57-20768D3DAD5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E4E5981-E3C6-46A5-AB57-20768D3DAD5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E4E5981-E3C6-46A5-AB57-20768D3DAD5A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
