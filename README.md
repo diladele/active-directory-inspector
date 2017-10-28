@@ -4,10 +4,12 @@ Active Directory inspection tool to be used in IP to User Name mapping in Squid'
 build
 -----
 
-1. Open solution in Visual Studio 2013.
-2. Select Debug configuration.
-3. Build Diladele.ActiveDirectory.Service project (all dependencies will be build automatically)
-4. Run build.bat in the root folder accordingly
+1. Ensure you have Visual Studio 2013.
+2. For production builds, change:
+	- tools\builder\shared.xml 
+	- src\Diladele.ActiveDirectory* \Properties\AssemblyInfo.cs to match the ones in shared.xml 
+3. Run build_debug.bat to get bin\Debug\active-directory-inspector.msi 
+   or build_release.bat to get bin\Release\active-directory-inspector.msi 
 
 install
 -------
