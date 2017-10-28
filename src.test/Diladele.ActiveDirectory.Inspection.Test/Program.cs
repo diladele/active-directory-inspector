@@ -27,6 +27,7 @@ namespace Diladele.ActiveDirectory.Inspection.Test
         static void Main(string[] args)
         {
             //TestRegex();
+            TestStorageDumper();
             TestWebServer();
             //TestHarvester();
             //TestListener();
@@ -44,6 +45,21 @@ namespace Diladele.ActiveDirectory.Inspection.Test
 
             // copy out the ip address
             string ip_addr = match.Groups[1].Value;
+        }
+
+        static void TestStorageDumper()
+        {
+            // load config
+            var config = ConfigFactory.Instance();
+
+            // load storage from disk
+            var storage = StorageFactory.LoadFromDisk();
+
+            // and give it to web server
+            using (var webserver = new Dumper(storage))
+            {
+                Thread.Sleep(100 * 1000);
+            }
         }
 
         static void TestWebServer()

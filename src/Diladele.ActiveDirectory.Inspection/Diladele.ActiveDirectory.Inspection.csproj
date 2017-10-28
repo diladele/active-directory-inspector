@@ -46,11 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Address.cs" />
+    <Compile Include="Dumper.cs" />
     <Compile Include="StorageFactory.cs" />
     <Compile Include="ActivityParser.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="Harverster.cs" />
-    <Compile Include="Inspector.cs" />
     <Compile Include="Activity.cs" />
     <Compile Include="Prober.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

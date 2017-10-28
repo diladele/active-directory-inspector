@@ -32,6 +32,9 @@ namespace Diladele.ActiveDirectory.Service
                 // load storage
                 _storage = StorageFactory.LoadFromDisk();
 
+                // start dumper
+                _dumper = new Dumper(_storage);
+
                 // start harvester
                 _harvester = new Harvester(_storage);
 
@@ -73,12 +76,16 @@ namespace Diladele.ActiveDirectory.Service
                 // stop harvester
                 _harvester.Dispose();
 
-                // dump the storage
+                // stop the dumper
+                _dumper.Dispose();
+
+                // dump the storage on disk again
                 StorageFactory.SaveToDisk(_storage);
 
                 // and reset all
                 _webserver = null;
                 _harvester = null;
+                _dumper    = null;
                 _listener  = null;
                 _storage   = null;
             }
@@ -92,6 +99,7 @@ namespace Diladele.ActiveDirectory.Service
 
         private WebServer _webserver;
         private Storage   _storage;
+        private Dumper    _dumper;
         private Harvester _harvester;
         private Listener  _listener;
         
