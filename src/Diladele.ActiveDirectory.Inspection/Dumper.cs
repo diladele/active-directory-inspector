@@ -23,7 +23,7 @@ namespace Diladele.ActiveDirectory.Inspection
             _storage      = storage;
             _active       = false;
             _disposed     = false;
-            _timer        = new Timer(this.OnTimerElapsedSafe, null, 1000, 250);
+            _timer        = new Timer(this.OnTimerElapsedSafe, null, 1000, 60 * 1000);
         }
 
         public void Dispose()
