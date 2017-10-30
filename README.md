@@ -11,6 +11,11 @@ build
 3. Run build_debug.bat to get bin\Debug\active-directory-inspector.msi 
    or build_release.bat to get bin\Release\active-directory-inspector.msi 
 
+or download the one we built
+----------------------------
+
+http://packages.diladele.com/adi/1.0.0.0/debug/active-directory-inspector.msi
+
 install
 -------
 
