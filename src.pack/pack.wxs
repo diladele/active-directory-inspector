@@ -35,7 +35,7 @@
             InstallerVersion="400" 
             InstallScope="perMachine"  
             Platform="x64"
-            Languages='1033,1049'
+            Languages='1033'
             SummaryCodepage='0'
         />
         
