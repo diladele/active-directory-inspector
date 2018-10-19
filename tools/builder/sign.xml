@@ -7,7 +7,7 @@
     </ItemGroup>
     <Target Name="SignBinaries">
         <Exec 
-            Command='"$(SignToolExe)" sign /ph /v /f $(SIGN_PFX) /p $(SIGN_PWD) /d "Active Directory Inspector" /t "http://timestamp.verisign.com/scripts/timestamp.dll" @(FilesToSign)'
+            Command='"$(SignToolExe)" sign /debug /a /tr http://rfc3161timestamp.globalsign.com/advanced /td SHA256 /d "Active Directory Inspector" @(FilesToSign)'
             WorkingDirectory="$(RootDir)\bin\$(Configuration)" />
     </Target>            
     <Target Name="Build" DependsOnTargets="SignBinaries"/>

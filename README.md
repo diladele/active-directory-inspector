@@ -4,7 +4,7 @@ Active Directory inspection tool to be used in IP to User Name mapping in Squid'
 build
 -----
 
-1. Ensure you have Visual Studio 2013.
+1. Ensure you have Visual Studio 2013 and WixToolSet 3.9 (http://wixtoolset.org/releases/v3.9/stable)
 2. For production builds, change:
 	- tools\builder\shared.xml 
 	- src\Diladele.ActiveDirectory* \Properties\AssemblyInfo.cs to match the ones in shared.xml 
