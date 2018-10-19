@@ -19,7 +19,7 @@
     </Target>
     <Target Name="Build" DependsOnTargets="CheckProperties">
         <Exec Command='"$(CandleExe)" /nologo /pedantic /ext WiXNetFxExtension /ext WiXUtilExtension /ext WixUIExtension /dOUTDIR=$(OutDir) /dBUILDTYPE=$(Configuration) /dVERSION=$(Version) /out $(OutDir)/pack.wixobj pack.wxs'/>
-        <Exec Command='"$(LightExe)" /pedantic /nologo /ext WiXNetFxExtension /ext WiXUtilExtension /ext WixUIExtension /ext WixSqlExtension /sval /out "$(OutDir)\$(MsiName)" $(OutDir)\*.wixobj'/>        
+        <Exec Command='"$(LightExe)" /pedantic /nologo /ext WiXNetFxExtension /ext WiXUtilExtension /ext WixUIExtension /sval /out "$(OutDir)\$(MsiName)" $(OutDir)\*.wixobj'/>        
     </Target>
     <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
 </Project>
